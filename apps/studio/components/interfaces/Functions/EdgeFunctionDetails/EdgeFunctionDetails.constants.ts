@@ -22,14 +22,8 @@ export const INVOCATION_TABS: InvocationTab[] = [
         : 'SUPABASE_ANON_KEY'
       const keyValue = showKey ? apiKey : obfuscatedName
 
-      // TatNet fork: always emit the apikey header. supabase.functions.invoke
-      // always sends it, and our edge functions authenticate the caller via
-      // @supabase/server's withSupabase, which validates the apikey header
-      // (not Authorization) — so a legacy JWT anon key example without apikey
-      // (upstream's behaviour for non-publishable keys) returns 401.
       return `curl -L -X POST '${functionUrl}' \\
-  -H 'Authorization: Bearer ${keyValue}' \\
-  -H 'apikey: ${keyValue}' \\
+  -H 'Authorization: Bearer ${keyValue}' \\${apiKey.includes('publishable') ? `\n  -H 'apikey: ${keyValue}' \\` : ''}
   -H 'Content-Type: application/json' \\
   --data '{"name":"Functions"}'`
     },
