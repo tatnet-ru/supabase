@@ -1,0 +1,46 @@
+# TatNet fork: build the patched Studio image and push it to ghcr.
+#
+# The fork carries ONE functional commit on top of the pinned upstream studio
+# release (Edge Functions write UI in self-hosted — see EDGE_FUNCTIONS_WRITABLE
+# in apps/studio/lib/constants). Bump procedure:
+#   1. git fetch upstream <new studio release sha>
+#   2. rebase the tatnet/* branch onto it (one commit + this workflow)
+#   3. run this workflow (workflow_dispatch) with the matching tag
+#   4. pin IMG_STUDIO in tatnet-supabase-control to the new ghcr tag
+name: tatnet-studio-image
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Image tag (e.g. 2026.07.13-tatnet1)"
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/studio/Dockerfile
+          target: production
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/tatnet-studio:${{ inputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

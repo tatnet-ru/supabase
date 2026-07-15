@@ -5,6 +5,18 @@ export * from './infrastructure'
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
 /**
+ * TatNet fork: Edge Functions write UI (deploy buttons) in self-hosted mode.
+ * On the TatNet platform the edge intercepts the Management API
+ * (/api/v1/projects/{ref}/functions*) in front of Studio and serves it from
+ * the platform's own serverless backend, so the native editor/deploy flows
+ * work without the cloud platform. Defaults ON in this fork; set
+ * NEXT_PUBLIC_EDGE_FUNCTIONS_WRITABLE=false at build time to restore the
+ * upstream read-only behaviour.
+ */
+export const EDGE_FUNCTIONS_WRITABLE =
+  IS_PLATFORM || process.env.NEXT_PUBLIC_EDGE_FUNCTIONS_WRITABLE !== 'false'
+
+/**
  * Server-side flag for Supabase CLI (local development) runs. Detected via
  * CURRENT_CLI_VERSION, which the CLI sets when launching Studio. The browser
  * cannot read this directly — use the /platform/deployment-mode endpoint.

@@ -14,7 +14,7 @@ import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL, EDGE_FUNCTIONS_WRITABLE, IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -51,7 +51,7 @@ export const FunctionsEmptyState = () => {
         </CardHeader>
         <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
           {/* Editor Option */}
-          {IS_PLATFORM && (
+          {EDGE_FUNCTIONS_WRITABLE && (
             <>
               <div className="p-8">
                 <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export const FunctionsEmptyState = () => {
           {isSelfHosted && <SelfHostedManualFunctionContent />}
         </CardContent>
       </Card>
-      {IS_PLATFORM && (
+      {EDGE_FUNCTIONS_WRITABLE && (
         <>
           <ScaffoldSectionTitle className="text-xl mb-4 mt-12">
             Start with a template
