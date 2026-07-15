@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { EDGE_FUNCTIONS_WRITABLE } from '@/lib/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
@@ -397,7 +397,7 @@ export const FileExplorerAndEditor = ({
           <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
             Files
           </h3>
-          {IS_PLATFORM && (
+          {EDGE_FUNCTIONS_WRITABLE && (
             <Button size="tiny" variant="default" icon={<Plus size={14} />} onClick={addNewFile}>
               Add File
             </Button>
@@ -440,7 +440,7 @@ export const FileExplorerAndEditor = ({
               padding: { top: 20, bottom: 20 },
               lineNumbersMinChars: 3,
               fixedOverflowWidgets: true,
-              readOnly: !IS_PLATFORM,
+              readOnly: !EDGE_FUNCTIONS_WRITABLE,
             }}
           />
         )}

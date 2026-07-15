@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { EDGE_FUNCTIONS_WRITABLE } from '@/lib/constants'
 import { Edit, File, Trash } from 'lucide-react'
 import {
   cn,
@@ -68,7 +68,7 @@ export const FileExplorerAndEditorRow = ({
             icon={<File size={14} className="text-foreground-light shrink-0" />}
             isEditing={isEditing}
             onEditSubmit={(value) => {
-              if (IS_PLATFORM && originalId !== null) {
+              if (EDGE_FUNCTIONS_WRITABLE && originalId !== null) {
                 handleFileNameChange(originalId, value)
               }
             }}
@@ -78,7 +78,7 @@ export const FileExplorerAndEditorRow = ({
               }
             }}
             onDoubleClick={() => {
-              if (IS_PLATFORM && originalId !== null) {
+              if (EDGE_FUNCTIONS_WRITABLE && originalId !== null) {
                 handleStartRename(originalId)
               }
             }}
@@ -99,7 +99,7 @@ export const FileExplorerAndEditorRow = ({
           />
         </div>
       </ContextMenuTrigger>
-      {IS_PLATFORM && (
+      {EDGE_FUNCTIONS_WRITABLE && (
         <ContextMenuContent onCloseAutoFocus={(e) => e.stopPropagation()}>
           <ContextMenuItem
             className="gap-x-2"
