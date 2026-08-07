@@ -5,21 +5,28 @@ import AuthLayout from './AuthLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
 
   const showEmails = useIsFeatureEnabled('authentication:emails')
 
+  // TatNet fork: self-hosted stacks send through the platform SMTP —
+  // per-stack SMTP is not configurable, so only Templates is offered.
   const navItems = [
     {
       label: 'Templates',
       href: `/project/${ref}/auth/templates`,
     },
-    {
-      label: 'SMTP Settings',
-      href: `/project/${ref}/auth/smtp`,
-    },
+    ...(IS_PLATFORM
+      ? [
+          {
+            label: 'SMTP Settings',
+            href: `/project/${ref}/auth/smtp`,
+          },
+        ]
+      : []),
   ]
 
   return (

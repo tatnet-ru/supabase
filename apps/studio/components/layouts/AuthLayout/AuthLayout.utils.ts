@@ -4,7 +4,7 @@ import { createElement } from 'react'
 
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from '@/lib/constants'
+import { AUTH_EMAIL_TEMPLATES_ENABLED, IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const ExternalLinkIcon = createElement(ArrowUpRight, { strokeWidth: 1, className: 'h-4 w-4' })
@@ -64,7 +64,9 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           : []),
       ],
     },
-    ...(features.emails && isPlatform
+    // TatNet fork: Emails visible in self-hosted too — the edge serves the
+    // auth-config API (AUTH_EMAIL_TEMPLATES_ENABLED covers isPlatform).
+    ...(features.emails && (isPlatform || AUTH_EMAIL_TEMPLATES_ENABLED)
       ? [
           {
             title: 'Notifications',
