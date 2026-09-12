@@ -49,6 +49,7 @@ import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functi
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { EDGE_FUNCTIONS_WRITABLE } from '@/lib/constants'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),
@@ -77,6 +78,13 @@ export const EdgeFunctionDetails = () => {
   )
 
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
+
+  // Deleting IS backed in self-hosted: the TatNet edge intercepts
+  // DELETE /v1/projects/{ref}/functions/{slug} and the api's shim drops the
+  // mapping row, the platform serverless function behind it and its warm VMs.
+  // Renaming / verify_jwt deliberately stay platform-only — verify_jwt is not
+  // enforced on our edge, so a switch here would promise what nothing honours.
+  const canDeleteEdgeFunction = EDGE_FUNCTIONS_WRITABLE && canUpdateEdgeFunctionPermission
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
@@ -307,38 +315,43 @@ export const EdgeFunctionDetails = () => {
         </PageSectionContent>
       </PageSection>
 
+      {/* Download-via-CLI is a genuine cloud feature (the CLI talks to the
+          real Management API), so it stays platform-only. */}
       {IS_PLATFORM && (
-        <>
-          <PageSection>
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Develop locally</PageSectionTitle>
-              </PageSectionSummary>
-            </PageSectionMeta>
-            <PageSectionContent>
-              <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
-                <div className="space-y-6">
-                  <CommandRender
-                    commands={[
-                      {
-                        command: `supabase functions download ${selectedFunction?.slug}`,
-                        description: 'Download the function to your local machine',
-                        jsx: () => (
-                          <>
-                            <span className="text-brand">supabase</span> functions download{' '}
-                            {selectedFunction?.slug}
-                          </>
-                        ),
-                        comment: '1. Download the function',
-                      },
-                    ]}
-                  />
-                  <CommandRender commands={[managementCommands[0]]} />
-                  <CommandRender commands={[managementCommands[1]]} />
-                </div>
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Develop locally</PageSectionTitle>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
+              <div className="space-y-6">
+                <CommandRender
+                  commands={[
+                    {
+                      command: `supabase functions download ${selectedFunction?.slug}`,
+                      description: 'Download the function to your local machine',
+                      jsx: () => (
+                        <>
+                          <span className="text-brand">supabase</span> functions download{' '}
+                          {selectedFunction?.slug}
+                        </>
+                      ),
+                      comment: '1. Download the function',
+                    },
+                  ]}
+                />
+                <CommandRender commands={[managementCommands[0]]} />
+                <CommandRender commands={[managementCommands[1]]} />
               </div>
-            </PageSectionContent>
-          </PageSection>
+            </div>
+          </PageSectionContent>
+        </PageSection>
+      )}
+
+      {EDGE_FUNCTIONS_WRITABLE && (
+        <>
           <PageSection>
             <PageSectionMeta>
               <PageSectionSummary>
@@ -355,7 +368,7 @@ export const EdgeFunctionDetails = () => {
                 <AlertDescription className="mt-3">
                   <Button
                     variant="danger"
-                    disabled={!canUpdateEdgeFunction}
+                    disabled={!canDeleteEdgeFunction}
                     loading={selectedFunction?.id === undefined}
                     onClick={() => setShowDeleteModal(true)}
                   >
