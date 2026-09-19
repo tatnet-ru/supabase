@@ -5,28 +5,27 @@ import AuthLayout from './AuthLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from '@/lib/constants'
 
 export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
 
   const showEmails = useIsFeatureEnabled('authentication:emails')
 
-  // TatNet fork: self-hosted stacks send through the platform SMTP —
-  // per-stack SMTP is not configurable, so only Templates is offered.
+  // TatNet fork: both tabs work in self-hosted. SmtpForm reads and writes the
+  // same /platform/auth/{ref}/config the templates use, and the TatNet edge
+  // intercepts it in front of Studio: supa-control stores the stack's own
+  // sender and builds gotrue's SMTP env from it (per-stack SMTP, 2026-08-17).
+  // The tab was hidden before that shipped; the page kept working, so the
+  // only thing the gate did was hide a working page from the nav.
   const navItems = [
     {
       label: 'Templates',
       href: `/project/${ref}/auth/templates`,
     },
-    ...(IS_PLATFORM
-      ? [
-          {
-            label: 'SMTP Settings',
-            href: `/project/${ref}/auth/smtp`,
-          },
-        ]
-      : []),
+    {
+      label: 'SMTP Settings',
+      href: `/project/${ref}/auth/smtp`,
+    },
   ]
 
   return (
