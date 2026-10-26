@@ -17,13 +17,17 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL, EDGE_FUNCTIONS_WRITABLE, IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const SecretsPage: NextPageWithLayout = () => {
   const { isCli, isSelfHosted } = useDeploymentMode()
 
-  if (!IS_PLATFORM) {
+  // TatNet fork: the platform edge serves the Management API /secrets in
+  // front of Studio (backed by the platform's own secret store + env-store
+  // replay into the stack's functions), so the full editor works in
+  // self-hosted — same gate as the Edge Functions write UI.
+  if (!IS_PLATFORM && !EDGE_FUNCTIONS_WRITABLE) {
     return (
       <PageContainer size="large">
         <PageSection>

@@ -4,7 +4,7 @@ import { useCallback } from 'react'
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
-import { IS_PLATFORM } from '@/lib/constants'
+import { AUTH_EMAIL_TEMPLATES_ENABLED } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type AuthConfigVariables = {
@@ -41,7 +41,14 @@ export const useAuthConfigQuery = <TData = ProjectAuthConfigData>(
   useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>({
     queryKey: authKeys.authConfig(projectRef),
     queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && projectRef !== '_',
+    // TatNet fork: the platform auth-config API is served by the edge
+    // intercept in self-hosted too (AUTH_EMAIL_TEMPLATES_ENABLED covers
+    // IS_PLATFORM), so the query runs and the templates pages render.
+    enabled:
+      enabled &&
+      AUTH_EMAIL_TEMPLATES_ENABLED &&
+      typeof projectRef !== 'undefined' &&
+      projectRef !== '_',
     ...options,
   })
 

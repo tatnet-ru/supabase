@@ -33,7 +33,12 @@ const SMTP_CONFIGURED_CONFIG = {
   SMTP_MAX_FREQUENCY: 60,
 }
 
-function mockAuthConfig(overrides: Partial<AuthConfigResponse>) {
+function mockAuthConfig(
+  overrides: Partial<AuthConfigResponse> & {
+    SMTP_EGRESS_STATUS?: string
+    SMTP_EGRESS_DETAIL?: string
+  }
+) {
   addAPIMock({
     method: 'get',
     path: '/platform/auth/:ref/config',
@@ -42,6 +47,31 @@ function mockAuthConfig(overrides: Partial<AuthConfigResponse>) {
 }
 
 describe('SmtpForm', () => {
+  test.each([
+    ['blocked', 'Outbound access to this mail server is closed'],
+    ['unknown', 'Could not check outbound access to this mail server'],
+  ])('shows the %s egress result without confusing unknown with blocked', async (status, title) => {
+    mockAuthConfig({
+      ...SMTP_CONFIGURED_CONFIG,
+      SMTP_EGRESS_STATUS: status,
+      SMTP_EGRESS_DETAIL: 'Region connectivity check result',
+    })
+    customRender(<SmtpForm />)
+    expect(await screen.findByText(title)).toBeInTheDocument()
+    expect(screen.getByText('Region connectivity check result')).toBeInTheDocument()
+  })
+
+  test('does not warn when the region can reach the SMTP server', async () => {
+    mockAuthConfig({
+      ...SMTP_CONFIGURED_CONFIG,
+      SMTP_EGRESS_STATUS: 'open',
+      SMTP_EGRESS_DETAIL: 'SMTP server is reachable',
+    })
+    customRender(<SmtpForm />)
+    await screen.findByText('Stored password is hidden. Enter a new password to replace it.')
+    expect(screen.queryByText('SMTP server is reachable')).not.toBeInTheDocument()
+  })
+
   test('shows a hidden-password placeholder when a password is already saved', async () => {
     mockAuthConfig(SMTP_CONFIGURED_CONFIG)
 

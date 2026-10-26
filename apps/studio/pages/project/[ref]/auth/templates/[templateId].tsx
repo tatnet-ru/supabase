@@ -62,7 +62,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
+import { AUTH_EMAIL_TEMPLATES_ENABLED, DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const TemplatePage: NextPageWithLayout = () => {
@@ -99,7 +99,14 @@ const RedirectToTemplates = () => {
       organization: selectedOrganization,
       projectInsertedAt: selectedProject?.inserted_at,
     })
-  const isTemplateEditorReadOnly = !isTemplateRestrictionStatusKnown || isTemplateEditBlocked
+  // TatNet fork: in self-hosted the restriction probes lean on the local
+  // /api/platform mocks (organizations, project) — writable only by
+  // coincidence, and silently read-only the day those paths get
+  // intercepted. State the intent explicitly: self-hosted is writable iff
+  // the templates feature is on; platform keeps the upstream logic.
+  const isTemplateEditorReadOnly = IS_PLATFORM
+    ? !isTemplateRestrictionStatusKnown || isTemplateEditBlocked
+    : !AUTH_EMAIL_TEMPLATES_ENABLED
   const hasSendEmailHook = !!(
     authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI
   )

@@ -11,6 +11,12 @@ export const AuthEmailsLayout = ({ children }: PropsWithChildren<{}>) => {
 
   const showEmails = useIsFeatureEnabled('authentication:emails')
 
+  // TatNet fork: both tabs work in self-hosted. SmtpForm reads and writes the
+  // same /platform/auth/{ref}/config the templates use, and the TatNet edge
+  // intercepts it in front of Studio: supa-control stores the stack's own
+  // sender and builds gotrue's SMTP env from it (per-stack SMTP, 2026-08-17).
+  // The tab was hidden before that shipped; the page kept working, so the
+  // only thing the gate did was hide a working page from the nav.
   const navItems = [
     {
       label: 'Templates',

@@ -1,0 +1,87 @@
+# Build the TatNet self-hosted fork and publish it to the organization package.
+# Upstream base: self-hosted/v0.8.3 (Studio 2026.10.12).
+# Keep the self-hosted function editor, secrets, deletion, email templates,
+# and SMTP settings patches when updating the upstream base.
+name: tatnet-studio-image
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image tag (e.g. 2026.10.12-tatnet1)'
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm --filter studio... install --frozen-lockfile
+      - name: Test self-hosted integrations
+        working-directory: apps/studio
+        run: >-
+          pnpm exec vitest run
+          lib/constants/tatnet.test.ts
+          components/layouts/AuthLayout/AuthLayout.utils.test.ts
+          components/interfaces/Auth/SmtpForm/SmtpForm.test.tsx
+          tests/components/Functions
+      - name: Lint Studio
+        run: pnpm --filter studio run lint
+      - name: Check TatNet patch formatting
+        run: >-
+          pnpm exec prettier --check
+          .github/workflows/tatnet-studio-image.yml
+          apps/studio/components/interfaces/Auth/SmtpForm/SmtpForm.test.tsx
+          apps/studio/components/interfaces/Auth/SmtpForm/SmtpForm.tsx
+          apps/studio/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.tsx
+          apps/studio/components/interfaces/Functions/FunctionsEmptyState.tsx
+          apps/studio/components/layouts/AuthLayout/AuthEmailsLayout.tsx
+          apps/studio/components/layouts/AuthLayout/AuthLayout.utils.test.ts
+          apps/studio/components/layouts/AuthLayout/AuthLayout.utils.ts
+          apps/studio/components/ui/FileExplorerAndEditor/FileExplorerAndEditorRow.tsx
+          apps/studio/components/ui/FileExplorerAndEditor/index.tsx
+          apps/studio/data/auth/auth-config-query.ts
+          apps/studio/lib/constants/index.ts
+          apps/studio/lib/constants/tatnet.test.ts
+          apps/studio/pages/project/[ref]/auth/templates/[templateId].tsx
+          apps/studio/pages/project/[ref]/functions/[functionSlug]/code.tsx
+          apps/studio/pages/project/[ref]/functions/index.tsx
+          apps/studio/pages/project/[ref]/functions/secrets.tsx
+      - name: Typecheck Studio
+        run: pnpm --filter studio run typecheck
+
+  build:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/studio/Dockerfile
+          target: production
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/tatnet-studio:${{ inputs.tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
