@@ -263,8 +263,9 @@ export const SmtpForm = () => {
   // from inside the region and answers on the auth-config payload; "unknown"
   // deliberately says only that we could not check, never that it is blocked.
   const smtpEgress = smtpEgressSchema.safeParse(authConfig)
-  const { SMTP_EGRESS_STATUS: egressStatus, SMTP_EGRESS_DETAIL: egressDetail } =
-    smtpEgress.success ? smtpEgress.data : {}
+  const { SMTP_EGRESS_STATUS: egressStatus, SMTP_EGRESS_DETAIL: egressDetail } = smtpEgress.success
+    ? smtpEgress.data
+    : {}
 
   return (
     <PageSection>

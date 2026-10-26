@@ -34,7 +34,10 @@ const SMTP_CONFIGURED_CONFIG = {
 }
 
 function mockAuthConfig(
-  overrides: Partial<AuthConfigResponse> & { SMTP_EGRESS_STATUS?: string; SMTP_EGRESS_DETAIL?: string }
+  overrides: Partial<AuthConfigResponse> & {
+    SMTP_EGRESS_STATUS?: string
+    SMTP_EGRESS_DETAIL?: string
+  }
 ) {
   addAPIMock({
     method: 'get',
@@ -44,7 +47,6 @@ function mockAuthConfig(
 }
 
 describe('SmtpForm', () => {
-
   test.each([
     ['blocked', 'Outbound access to this mail server is closed'],
     ['unknown', 'Could not check outbound access to this mail server'],
