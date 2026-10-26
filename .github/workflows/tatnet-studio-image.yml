@@ -36,6 +36,28 @@ jobs:
           components/layouts/AuthLayout/AuthLayout.utils.test.ts
           components/interfaces/Auth/SmtpForm/SmtpForm.test.tsx
           tests/components/Functions
+      - name: Lint Studio
+        run: pnpm --filter studio run lint
+      - name: Check TatNet patch formatting
+        run: >-
+          pnpm exec prettier --check
+          .github/workflows/tatnet-studio-image.yml
+          apps/studio/components/interfaces/Auth/SmtpForm/SmtpForm.test.tsx
+          apps/studio/components/interfaces/Auth/SmtpForm/SmtpForm.tsx
+          apps/studio/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.tsx
+          apps/studio/components/interfaces/Functions/FunctionsEmptyState.tsx
+          apps/studio/components/layouts/AuthLayout/AuthEmailsLayout.tsx
+          apps/studio/components/layouts/AuthLayout/AuthLayout.utils.test.ts
+          apps/studio/components/layouts/AuthLayout/AuthLayout.utils.ts
+          apps/studio/components/ui/FileExplorerAndEditor/FileExplorerAndEditorRow.tsx
+          apps/studio/components/ui/FileExplorerAndEditor/index.tsx
+          apps/studio/data/auth/auth-config-query.ts
+          apps/studio/lib/constants/index.ts
+          apps/studio/lib/constants/tatnet.test.ts
+          apps/studio/pages/project/[ref]/auth/templates/[templateId].tsx
+          apps/studio/pages/project/[ref]/functions/[functionSlug]/code.tsx
+          apps/studio/pages/project/[ref]/functions/index.tsx
+          apps/studio/pages/project/[ref]/functions/secrets.tsx
       - name: Typecheck Studio
         run: pnpm --filter studio run typecheck
 
