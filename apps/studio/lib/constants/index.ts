@@ -11,7 +11,7 @@ export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
  * the platform's own serverless backend, so the native editor/deploy flows
  * work without the cloud platform. Defaults ON in this fork; set
  * NEXT_PUBLIC_EDGE_FUNCTIONS_WRITABLE=false at build time to restore the
- * upstream read-only behaviour.
+ * upstream read-only behavior.
  */
 export const EDGE_FUNCTIONS_WRITABLE =
   IS_PLATFORM || process.env.NEXT_PUBLIC_EDGE_FUNCTIONS_WRITABLE !== 'false'
@@ -23,7 +23,7 @@ export const EDGE_FUNCTIONS_WRITABLE =
  * from supa-control, which stores per-project template overrides and feeds
  * them to gotrue. Defaults ON in this fork; set
  * NEXT_PUBLIC_AUTH_EMAIL_TEMPLATES=false at build time to restore the
- * upstream behaviour (section hidden in self-hosted).
+ * upstream behavior (section hidden in self-hosted).
  */
 export const AUTH_EMAIL_TEMPLATES_ENABLED =
   IS_PLATFORM || process.env.NEXT_PUBLIC_AUTH_EMAIL_TEMPLATES !== 'false'

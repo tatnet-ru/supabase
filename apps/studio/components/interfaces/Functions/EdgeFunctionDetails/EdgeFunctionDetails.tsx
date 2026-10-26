@@ -83,7 +83,7 @@ export const EdgeFunctionDetails = () => {
   // DELETE /v1/projects/{ref}/functions/{slug} and the api's shim drops the
   // mapping row, the platform serverless function behind it and its warm VMs.
   // Renaming / verify_jwt deliberately stay platform-only — verify_jwt is not
-  // enforced on our edge, so a switch here would promise what nothing honours.
+  // enforced on our edge, so a switch here would promise what nothing honors.
   const canDeleteEdgeFunction = EDGE_FUNCTIONS_WRITABLE && canUpdateEdgeFunctionPermission
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
