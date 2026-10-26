@@ -1,4 +1,3 @@
-import { IS_PLATFORM } from 'common'
 import { PlusIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useState } from 'react'
@@ -15,6 +14,7 @@ import {
 } from './FileExplorerAndEditor.utils'
 import { FileExplorerAndEditorRow } from './FileExplorerAndEditorRow'
 import { AIEditor } from '@/components/ui/AIEditor'
+import { EDGE_FUNCTIONS_WRITABLE } from '@/lib/constants'
 
 interface FileExplorerAndEditorProps {
   files: FileData[]
@@ -397,7 +397,7 @@ export const FileExplorerAndEditor = ({
           <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
             Files
           </h3>
-          {IS_PLATFORM && (
+          {EDGE_FUNCTIONS_WRITABLE && (
             <Button size="tiny" icon={<PlusIcon size={14} />} onClick={addNewFile}>
               Add File
             </Button>
@@ -440,7 +440,7 @@ export const FileExplorerAndEditor = ({
               padding: { top: 20, bottom: 20 },
               lineNumbersMinChars: 3,
               fixedOverflowWidgets: true,
-              readOnly: !IS_PLATFORM,
+              readOnly: !EDGE_FUNCTIONS_WRITABLE,
             }}
           />
         )}

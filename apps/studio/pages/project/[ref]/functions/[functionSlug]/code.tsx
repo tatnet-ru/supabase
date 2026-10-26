@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { AlertCircleIcon, CornerDownLeftIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -25,7 +25,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
-import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { BASE_PATH, DOCS_URL, EDGE_FUNCTIONS_WRITABLE } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 const CodePage = () => {
@@ -222,7 +222,7 @@ const CodePage = () => {
               orgSlug: org?.slug,
             }}
           />
-          {IS_PLATFORM && (
+          {EDGE_FUNCTIONS_WRITABLE && (
             <div className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 shrink-0">
               <ButtonTooltip
                 variant="primary"

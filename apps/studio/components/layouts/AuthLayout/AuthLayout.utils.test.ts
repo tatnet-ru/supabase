@@ -89,7 +89,7 @@ describe('generateAuthMenu', () => {
     expect(names).not.toContain('Performance')
   })
 
-  it('self-hosted hides OAuth Apps, Notifications, and platform-only Configuration items', () => {
+  it('self-hosted shows Emails but hides platform-only configuration', () => {
     const menu = generateAuthMenu({
       ...allFeaturesEnabled,
       isPlatform: false,
@@ -98,12 +98,22 @@ describe('generateAuthMenu', () => {
     const groupTitles = menu.map((g) => g.title)
 
     expect(names).not.toContain('OAuth Apps')
-    expect(groupTitles).not.toContain('Notifications')
+    expect(groupTitles).toContain('Notifications')
+    expect(findItem(menu, 'Emails')).toMatchObject({
+      url: '/project/test-ref/auth/templates',
+      pages: ['templates', 'smtp'],
+    })
 
     // Configuration should only have Policies
     const configGroup = menu.find((g) => g.title === 'Configuration')!
     expect(configGroup.items).toHaveLength(1)
     expect(configGroup.items[0].name).toBe('Policies')
+  })
+
+  it('self-hosted hides Emails when the emails feature is disabled', () => {
+    const menu = generateAuthMenu({ ...allFeaturesDisabled, isPlatform: false })
+    expect(flatItemNames(menu)).not.toContain('Emails')
+    expect(menu.map((group) => group.title)).not.toContain('Notifications')
   })
 
   it('shows Overview when showOverview is true', () => {

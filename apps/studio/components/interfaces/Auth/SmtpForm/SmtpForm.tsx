@@ -76,6 +76,11 @@ const smtpSchema = z.discriminatedUnion('ENABLE_SMTP', [smtpEnabledSchema, smtpD
 
 type SmtpFormValues = z.infer<typeof smtpSchema>
 
+const smtpEgressSchema = z.object({
+  SMTP_EGRESS_STATUS: z.enum(['open', 'blocked', 'unknown']).optional(),
+  SMTP_EGRESS_DETAIL: z.string().optional(),
+})
+
 export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const {
@@ -251,9 +256,30 @@ export const SmtpForm = () => {
 
   const showEnablingAdmonition = form.formState.isDirty && enableSmtp && !isSmtpEnabled(authConfig)
 
+  // TatNet fork: whether this region can actually reach the saved mail server.
+  // The platform blocks outbound submission ports by default, so a sender can
+  // save cleanly and still never deliver — the gap used to surface a week
+  // later as "the login codes never arrive". supa-control resolves the host
+  // from inside the region and answers on the auth-config payload; "unknown"
+  // deliberately says only that we could not check, never that it is blocked.
+  const smtpEgress = smtpEgressSchema.safeParse(authConfig)
+  const { SMTP_EGRESS_STATUS: egressStatus, SMTP_EGRESS_DETAIL: egressDetail } =
+    smtpEgress.success ? smtpEgress.data : {}
+
   return (
     <PageSection>
       <PageSectionContent>
+        {egressDetail && egressStatus !== 'open' && (
+          <Admonition
+            type={egressStatus === 'blocked' ? 'warning' : 'default'}
+            title={
+              egressStatus === 'blocked'
+                ? 'Outbound access to this mail server is closed'
+                : 'Could not check outbound access to this mail server'
+            }
+            description={egressDetail}
+          />
+        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <Card>

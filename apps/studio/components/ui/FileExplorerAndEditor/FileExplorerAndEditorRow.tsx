@@ -1,4 +1,3 @@
-import { IS_PLATFORM } from 'common'
 import { EditIcon, FileIcon, TrashIcon } from 'lucide-react'
 import {
   cn,
@@ -15,6 +14,7 @@ import {
 } from 'ui'
 
 import { FileData } from './FileExplorerAndEditor.types'
+import { EDGE_FUNCTIONS_WRITABLE } from '@/lib/constants'
 
 type FileExplorerAndEditorRowProps = INodeRendererProps & {
   files: FileData[]
@@ -68,7 +68,7 @@ export const FileExplorerAndEditorRow = ({
             icon={<FileIcon size={14} className="text-foreground-light shrink-0" />}
             isEditing={isEditing}
             onEditSubmit={(value) => {
-              if (IS_PLATFORM && originalId !== null) {
+              if (EDGE_FUNCTIONS_WRITABLE && originalId !== null) {
                 handleFileNameChange(originalId, value)
               }
             }}
@@ -78,7 +78,7 @@ export const FileExplorerAndEditorRow = ({
               }
             }}
             onDoubleClick={() => {
-              if (IS_PLATFORM && originalId !== null) {
+              if (EDGE_FUNCTIONS_WRITABLE && originalId !== null) {
                 handleStartRename(originalId)
               }
             }}
@@ -99,7 +99,7 @@ export const FileExplorerAndEditorRow = ({
           />
         </div>
       </ContextMenuTrigger>
-      {IS_PLATFORM && (
+      {EDGE_FUNCTIONS_WRITABLE && (
         <ContextMenuContent onCloseAutoFocus={(e) => e.stopPropagation()}>
           <ContextMenuItem
             className="gap-x-2"

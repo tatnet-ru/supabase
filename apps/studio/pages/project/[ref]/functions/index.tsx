@@ -38,7 +38,7 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL, EDGE_FUNCTIONS_WRITABLE, IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import type { NextPageWithLayout } from '@/types'
@@ -250,7 +250,7 @@ export const EdgeFunctionsIndexPageWrapper = ({ children }: PropsWithChildren) =
                 Examples
               </a>
             </Button>
-            {IS_PLATFORM && <DeployEdgeFunctionButton />}
+            {EDGE_FUNCTIONS_WRITABLE && <DeployEdgeFunctionButton />}
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
