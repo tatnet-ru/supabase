@@ -6,6 +6,7 @@ import { CustomAuthProviders } from '@/components/interfaces/Auth/CustomAuthProv
 import { AuthProvidersLayout } from '@/components/layouts/AuthLayout/AuthProvidersLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ProvidersPage: NextPageWithLayout = () => {
@@ -15,8 +16,8 @@ const ProvidersPage: NextPageWithLayout = () => {
   return (
     <PageContainer size="default">
       <BasicAuthSettingsForm />
-      {showProviders && <AuthProvidersForm />}
-      {showCustomProviders && <CustomAuthProviders />}
+      {IS_PLATFORM && showProviders && <AuthProvidersForm />}
+      {IS_PLATFORM && showCustomProviders && <CustomAuthProviders />}
     </PageContainer>
   )
 }
