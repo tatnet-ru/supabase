@@ -39,7 +39,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 const schema = z.object({
   DISABLE_SIGNUP: z.boolean(),
@@ -295,7 +295,13 @@ export const BasicAuthSettingsForm = () => {
                       <WarningIcon />
                       <AlertTitle>
                         We highly recommend{' '}
-                        <InlineLink href={`/project/${projectRef}/auth/protection`}>
+                        <InlineLink
+                          href={
+                            IS_PLATFORM
+                              ? `/project/${projectRef}/auth/protection`
+                              : `${DOCS_URL}/guides/auth/auth-captcha`
+                          }
+                        >
                           enabling captcha
                         </InlineLink>{' '}
                         for anonymous sign-ins

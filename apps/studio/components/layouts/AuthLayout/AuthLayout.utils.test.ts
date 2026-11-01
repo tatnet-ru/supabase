@@ -93,6 +93,7 @@ describe('generateAuthMenu', () => {
     const menu = generateAuthMenu({
       ...allFeaturesEnabled,
       isPlatform: false,
+      authConfigEnabled: true,
     })
     const names = flatItemNames(menu)
     const groupTitles = menu.map((g) => g.title)
@@ -104,9 +105,13 @@ describe('generateAuthMenu', () => {
       pages: ['templates', 'smtp'],
     })
 
-    // Configuration should only have Policies
+    // Only settings supported by the TatNet auth-config bridge are exposed.
     const configGroup = menu.find((g) => g.title === 'Configuration')!
-    expect(configGroup.items).toHaveLength(1)
+    expect(configGroup.items.map((item) => item.name)).toEqual([
+      'Policies',
+      'Sign In / Providers',
+      'Rate Limits',
+    ])
     expect(configGroup.items[0].name).toBe('Policies')
   })
 
@@ -114,6 +119,43 @@ describe('generateAuthMenu', () => {
     const menu = generateAuthMenu({ ...allFeaturesDisabled, isPlatform: false })
     expect(flatItemNames(menu)).not.toContain('Emails')
     expect(menu.map((group) => group.title)).not.toContain('Notifications')
+  })
+
+  it('TatNet self-hosted exposes supported signup and rate-limit settings only', () => {
+    const menu = generateAuthMenu({
+      ...allFeaturesEnabled,
+      isPlatform: false,
+      authConfigEnabled: true,
+    })
+    const names = flatItemNames(menu)
+    expect(findItem(menu, 'Sign In / Providers')?.url).toBe('/project/test-ref/auth/providers')
+    expect(findItem(menu, 'Rate Limits')?.url).toBe('/project/test-ref/auth/rate-limits')
+    for (const unsupported of [
+      'OAuth Apps',
+      'OAuth Server',
+      'Sessions',
+      'Attack Protection',
+      'Auth Hooks',
+      'Multi-Factor',
+    ]) {
+      expect(names).not.toContain(unsupported)
+    }
+    const disabled = generateAuthMenu({
+      ...allFeaturesDisabled,
+      isPlatform: false,
+      authConfigEnabled: true,
+    })
+    expect(flatItemNames(disabled)).not.toContain('Sign In / Providers')
+    expect(flatItemNames(disabled)).not.toContain('Rate Limits')
+  })
+
+  it('self-hosted without the auth-config bridge keeps upstream navigation', () => {
+    const menu = generateAuthMenu({
+      ...allFeaturesEnabled,
+      isPlatform: false,
+      authConfigEnabled: false,
+    })
+    expect(flatItemNames(menu)).toEqual(['Overview', 'Users', 'Policies'])
   })
 
   it('shows Overview when showOverview is true', () => {

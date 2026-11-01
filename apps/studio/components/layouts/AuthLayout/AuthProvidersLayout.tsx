@@ -5,6 +5,7 @@ import AuthLayout from './AuthLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
@@ -18,7 +19,7 @@ export const AuthProvidersLayout = ({ children }: PropsWithChildren<{}>) => {
       label: 'Supabase Auth',
       href: `/project/${ref}/auth/providers`,
     },
-    ...(authenticationThirdPartyAuth
+    ...(IS_PLATFORM && authenticationThirdPartyAuth
       ? [
           {
             label: 'Third-Party Auth',

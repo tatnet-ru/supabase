@@ -12,6 +12,7 @@ const ExternalLinkIcon = createElement(ArrowUpRightIcon, { strokeWidth: 1, class
 export interface GenerateAuthMenuOptions {
   ref?: string
   isPlatform: boolean
+  authConfigEnabled?: boolean
   showOverview: boolean
   features: {
     signInProviders: boolean
@@ -25,7 +26,13 @@ export interface GenerateAuthMenuOptions {
 }
 
 export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuGroup[] {
-  const { ref, isPlatform, showOverview, features } = options
+  const {
+    ref,
+    isPlatform,
+    showOverview,
+    features,
+    authConfigEnabled = AUTH_EMAIL_TEMPLATES_ENABLED,
+  } = options
   const passkeysInMenu = Boolean(features.passkeys)
   const baseUrl = `/project/${ref}/auth`
 
@@ -66,7 +73,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
     },
     // TatNet fork: Emails visible in self-hosted too — the edge serves the
     // auth-config API (AUTH_EMAIL_TEMPLATES_ENABLED covers isPlatform).
-    ...(features.emails && (isPlatform || AUTH_EMAIL_TEMPLATES_ENABLED)
+    ...(features.emails && (isPlatform || authConfigEnabled)
       ? [
           {
             title: 'Notifications',
@@ -98,7 +105,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           items: [],
           // shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
         },
-        ...(isPlatform
+        ...(isPlatform || authConfigEnabled
           ? [
               ...(features.signInProviders
                 ? [
@@ -112,6 +119,21 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                     },
                   ]
                 : []),
+              ...(features.rateLimits
+                ? [
+                    {
+                      name: 'Rate Limits',
+                      key: 'rate-limits',
+                      url: `${baseUrl}/rate-limits`,
+                      items: [],
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_RATE_LIMITS,
+                    },
+                  ]
+                : []),
+            ]
+          : []),
+        ...(isPlatform
+          ? [
               ...(passkeysInMenu
                 ? [
                     {
@@ -137,17 +159,6 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                 items: [],
                 shortcutId: SHORTCUT_IDS.NAV_AUTH_SESSIONS,
               },
-              ...(features.rateLimits
-                ? [
-                    {
-                      name: 'Rate Limits',
-                      key: 'rate-limits',
-                      url: `${baseUrl}/rate-limits`,
-                      items: [],
-                      shortcutId: SHORTCUT_IDS.NAV_AUTH_RATE_LIMITS,
-                    },
-                  ]
-                : []),
               ...(features.multiFactor
                 ? [
                     {
