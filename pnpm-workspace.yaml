@@ -118,6 +118,9 @@ minimumReleaseAgeExclude:
   - '@tanstack/store@0.11.2'
 
 overrides:
+  # markdown-toc only needs front-matter parsing; gray-matter v4 removes
+  # the obsolete, vulnerable TOML parser bundled by v2.
+  'markdown-toc>gray-matter': ^4.0.3
   # Keep Markdown renderers and the directly imported stylesheet on one release.
   'katex@<0.18.2': 0.18.2
   '@ardatan/relay-compiler>immutable': ^3.8.3
