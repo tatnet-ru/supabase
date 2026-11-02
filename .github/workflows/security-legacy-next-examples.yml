@@ -1,0 +1,41 @@
+name: Legacy Next.js security migration checks
+
+on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - 'examples/todo-list/nextjs-todo-list/**'
+      - 'examples/realtime/nextjs-auth-presence/**'
+      - 'examples/caching/with-react-query-nextjs-14/**'
+      - 'examples/caching/with-nextjs-13/**'
+      - 'examples/caching/with-nextjs-13-server-components/**'
+      - '.github/scripts/check-legacy-next-example.mjs'
+      - '.github/workflows/security-legacy-next-examples.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - examples/todo-list/nextjs-todo-list
+          - examples/realtime/nextjs-auth-presence
+          - examples/caching/with-react-query-nextjs-14
+          - examples/caching/with-nextjs-13
+          - examples/caching/with-nextjs-13-server-components
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NODE_OPTIONS: --no-experimental-webstorage
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: npm install --ignore-scripts --package-lock=false
+        working-directory: ${{ matrix.example }}
+      - run: node .github/scripts/check-legacy-next-example.mjs '${{ matrix.example }}'
