@@ -119,6 +119,7 @@ catalogs:
       version: 3.25.76
 
 overrides:
+  markdown-toc>gray-matter: ^4.0.3
   '@ardatan/relay-compiler>immutable': ^3.8.3
   monaco-editor: 0.52.2
   '@mapbox/node-pre-gyp>tar': ^7.5.21
@@ -10431,10 +10432,6 @@ packages:
     resolution: {integrity: sha512-gKXj5ALrKWQLsYG9jlTRmR/xKluxHV+Z9QEwNIgCfM1/uwPMCuzVVnh5mwTd+OuBZcwSIMbqssNWRm1lE51QaQ==}
     engines: {node: '>=8'}
 
-  ansi-red@0.1.1:
-    resolution: {integrity: sha512-ewaIr5y+9CUTGFwZfpECUbFlGcC0GCw1oqR9RI6h1gQCd9Aj2GxSckCnPsVJnmfMZbwFYE+leZGASgkWl06Jow==}
-    engines: {node: '>=0.10.0'}
-
   ansi-regex@5.0.1:
     resolution: {integrity: sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==}
     engines: {node: '>=8'}
@@ -10462,10 +10459,6 @@ packages:
   ansi-styles@6.2.1:
     resolution: {integrity: sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==}
     engines: {node: '>=12'}
-
-  ansi-wrap@0.1.0:
-    resolution: {integrity: sha512-ZyznvL8k/FZeQHr2T6LzcJ/+vBApDnMNZvfVFy3At0knswWd6rJ3/0Hhmpu8oqa6C92npmozs890sX9Dl6q+Qw==}
-    engines: {node: '>=0.10.0'}
 
   ansis@4.3.1:
     resolution: {integrity: sha512-BJ8/l4R5LRE7hW9WdSuGYrLSHi2ynxeFpDFbH0K/CgNeY/tyhk+vO6TYxXC5r5CpUhNVX310xzPsN/H9lCdfOA==}
@@ -11129,12 +11122,6 @@ packages:
 
   codemirror@5.65.15:
     resolution: {integrity: sha512-YC4EHbbwQeubZzxLl5G4nlbLc1T21QTrKGaOal/Pkm9dVDMZXMH7+ieSPEOZCtO9I68i8/oteJKOxzHC2zR+0g==}
-
-  coffee-script@1.12.7:
-    resolution: {integrity: sha512-fLeEhqwymYat/MpTPUjSKHVYYl0ec2mOyALEMLmzr5i1isuG+6jfI2j2d5oBO3VIzgUXgBVIcOT9uH1TFxBckw==}
-    engines: {node: '>=0.8.0'}
-    deprecated: CoffeeScript on NPM has moved to "coffeescript" (no hyphen)
-    hasBin: true
 
   collapse-white-space@2.1.0:
     resolution: {integrity: sha512-loKTxY1zCOuG4j9f6EPnuyyYkf58RnhhWTvRoZEokgB+WbdXehfjFviyOVYkqzEWz1Q5kRiZdBYS5SwxbQYwzw==}
@@ -13201,10 +13188,6 @@ packages:
   graphql@16.11.0:
     resolution: {integrity: sha512-mS1lbMsxgQj6hge1XZ6p7GPhbrtFwUFYi3wRzXAC/FmYnyXMTvvI3td3rjmQ2u8ewXueaSvRPWaEcgVVOT9Jnw==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
-
-  gray-matter@2.1.1:
-    resolution: {integrity: sha512-vbmvP1Fe/fxuT2QuLVcqb2BfK7upGhhbLIt9/owWEvPYrZZEkelLcq2HqzxosV+PQ67dUFLaAeNpH7C4hhICAA==}
-    engines: {node: '>=0.10.0'}
 
   gray-matter@4.0.3:
     resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
@@ -17937,9 +17920,6 @@ packages:
   toidentifier@1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
-
-  toml@2.3.6:
-    resolution: {integrity: sha512-gVweAectJU3ebq//Ferr2JUY4WKSDe5N+z0FvjDncLGyHmIDoxgY/2Ie4qfEIDm4IS7OA6Rmdm7pdEEdMcV/xQ==}
 
   topojson-client@3.1.0:
     resolution: {integrity: sha512-605uxS6bcYxGXw9qi62XyrV6Q3xwbndjachmNxu8HWTtVPxZfEJN9fd/SZS1Q54Sn2y0TMyMxFj/cJINqGHrKw==}
@@ -27919,10 +27899,6 @@ snapshots:
     dependencies:
       type-fest: 0.21.3
 
-  ansi-red@0.1.1:
-    dependencies:
-      ansi-wrap: 0.1.0
-
   ansi-regex@5.0.1: {}
 
   ansi-regex@6.0.1: {}
@@ -27940,8 +27916,6 @@ snapshots:
   ansi-styles@5.2.0: {}
 
   ansi-styles@6.2.1: {}
-
-  ansi-wrap@0.1.0: {}
 
   ansis@4.3.1: {}
 
@@ -28820,8 +28794,6 @@ snapshots:
       graphql-language-service: 5.3.1(graphql@16.11.0)
 
   codemirror@5.65.15: {}
-
-  coffee-script@1.12.7: {}
 
   collapse-white-space@2.1.0: {}
 
@@ -31167,14 +31139,6 @@ snapshots:
 
   graphql@16.11.0: {}
 
-  gray-matter@2.1.1:
-    dependencies:
-      ansi-red: 0.1.1
-      coffee-script: 1.12.7
-      extend-shallow: 2.0.1
-      js-yaml: 3.15.2
-      toml: 2.3.6
-
   gray-matter@4.0.3:
     dependencies:
       js-yaml: 3.15.2
@@ -32672,7 +32636,7 @@ snapshots:
     dependencies:
       concat-stream: 1.6.2
       diacritics-map: 0.1.0
-      gray-matter: 2.1.1
+      gray-matter: 4.0.3
       lazy-cache: 2.0.2
       list-item: 1.1.1
       markdown-link: 0.1.1
@@ -37436,8 +37400,6 @@ snapshots:
   toggle-selection@1.0.6: {}
 
   toidentifier@1.0.1: {}
-
-  toml@2.3.6: {}
 
   topojson-client@3.1.0:
     dependencies:

@@ -1,0 +1,30 @@
+name: Markdown table of contents security checks
+
+on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/scripts/check-markdown-toc.mjs'
+      - '.github/workflows/security-markdown-toc.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          check-latest: true
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node .github/scripts/check-markdown-toc.mjs
