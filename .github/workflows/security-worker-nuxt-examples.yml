@@ -1,0 +1,54 @@
+name: Worker and Nuxt security example checks
+
+on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - 'examples/with-cloudflare-workers/**'
+      - 'examples/caching/with-cloudflare-workers-kv/**'
+      - 'examples/user-management/nuxt3-user-management/**'
+      - '.github/scripts/check-nuxt-security-example.mjs'
+      - '.github/workflows/security-worker-nuxt-examples.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  worker-bundles:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - examples/with-cloudflare-workers
+          - examples/caching/with-cloudflare-workers-kv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: npm install --ignore-scripts --package-lock=false
+        working-directory: ${{ matrix.example }}
+      - run: npx --no-install wrangler publish --dry-run --outdir /tmp/worker-bundle
+        working-directory: ${{ matrix.example }}
+  nuxt-build-and-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      SUPABASE_URL: http://127.0.0.1:54321
+      SUPABASE_KEY: fixture-key
+      NUXT_TELEMETRY_DISABLED: '1'
+    defaults:
+      run:
+        working-directory: examples/user-management/nuxt3-user-management
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: npm install --ignore-scripts --package-lock=false
+      - run: npm run build
+      - run: npx --no-install nuxi typecheck
+      - run: node .github/scripts/check-nuxt-security-example.mjs examples/user-management/nuxt3-user-management
+        working-directory: .
