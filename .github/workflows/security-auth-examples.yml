@@ -1,0 +1,46 @@
+name: Auth example dependency security checks
+
+on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - 'examples/auth/nextjs/**'
+      - 'examples/auth/nextjs-full/**'
+      - 'examples/realtime/nextjs-authorization-demo/**'
+      - 'examples/auth/quickstarts/react/**'
+      - 'examples/auth/hono/**'
+      - 'examples/auth/hono-full/**'
+      - '.github/scripts/check-auth-dependency-example.mjs'
+      - '.github/workflows/security-auth-examples.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - examples/auth/nextjs
+          - examples/auth/nextjs-full
+          - examples/realtime/nextjs-authorization-demo
+          - examples/auth/quickstarts/react
+          - examples/auth/hono
+          - examples/auth/hono-full
+    env:
+      NODE_OPTIONS: --no-experimental-webstorage
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: npm install --ignore-scripts
+        working-directory: ${{ matrix.example }}
+      - run: node .github/scripts/check-auth-dependency-example.mjs '${{ matrix.example }}'
+      - run: node .github/scripts/check-auth-dependency-example.mjs '${{ matrix.example }}' --dev
+        if: startsWith(matrix.example, 'examples/auth/hono')
+      - run: npm audit --audit-level=moderate
+        working-directory: ${{ matrix.example }}
