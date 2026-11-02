@@ -61,6 +61,8 @@ catalog:
   zod: 4.6.7
 
 allowBuilds:
+  # Published JS is prebuilt; skip the repository-only package-manager guard.
+  autoevals: false
   '@parcel/watcher': false
   '@sentry/cli': false
   '@supabase/build-icons@file:packages/build-icons': set this to true or false

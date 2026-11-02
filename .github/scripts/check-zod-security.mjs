@@ -91,6 +91,9 @@ const completion = await wrapped.chat.completions.create({
   messages: [{ role: 'user', content: 'fixture' }],
 })
 assert.equal(completion.choices[0].message.content, '{"answer":"fixture answer"}')
+const { Levenshtein, ExactMatch } = await import(studio.resolve('autoevals'))
+assert.equal((await Levenshtein({ output: 'fixture', expected: 'fixture' })).score, 1)
+assert.equal((await ExactMatch({ output: 'fixture', expected: 'different' })).score, 0)
 console.log(
-  'Zod 4: sync/async collection size gates, OpenAI structured output, AI SDK schema validation and Braintrust wrapper passed; all provider requests mocked'
+  'Zod 4: sync/async collection size gates, OpenAI structured output, AI SDK schema validation Braintrust wrapper and autoevals scorers passed; all provider requests mocked'
 )
