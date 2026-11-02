@@ -5,6 +5,15 @@
 name: tatnet-studio-image
 
 on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - '.github/workflows/tatnet-studio-image.yml'
+      - 'apps/studio/**'
+      - 'packages/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
   workflow_dispatch:
     inputs:
       tag:
@@ -13,7 +22,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 jobs:
   checks:
@@ -27,12 +35,13 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
-      - run: pnpm --filter studio... install --frozen-lockfile
+      - run: pnpm --filter studio... install --frozen-lockfile --ignore-scripts
       - name: Test self-hosted integrations
         working-directory: apps/studio
         run: >-
           pnpm exec vitest run
           lib/constants/tatnet.test.ts
+          lib/sentry-client-options.test.ts
           components/layouts/AuthLayout/AuthLayout.utils.test.ts
           components/interfaces/Auth/SmtpForm/SmtpForm.test.tsx
           tests/components/Functions
@@ -62,7 +71,11 @@ jobs:
         run: pnpm --filter studio run typecheck
 
   build:
+    if: github.event_name == 'workflow_dispatch'
     needs: checks
+    permissions:
+      contents: read
+      packages: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
