@@ -4,6 +4,7 @@ export interface Database {
   public: {
     Tables: {
       todos: {
+        Relationships: []
         Row: {
           id: number
           user_id: string
