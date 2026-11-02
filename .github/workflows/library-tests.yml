@@ -45,9 +45,14 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
+          check-latest: true
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+      - run: node .github/scripts/check-provider-utils-download.mjs
+      - run: pnpm --filter @supabase/vue-blocks run typecheck
+      - run: pnpm --filter kb test
+      - run: pnpm --filter lite-studio build
       - run: pnpm --filter library test
       - run: pnpm --filter library build:registry
       - name: Check generated registry
