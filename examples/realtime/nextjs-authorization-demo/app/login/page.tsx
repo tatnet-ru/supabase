@@ -1,10 +1,16 @@
-import Link from 'next/link'
 import { headers } from 'next/headers'
-import { createClient } from '@/utils/supabase/server'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { SubmitButton } from '../../components/submit-button'
 
-export default function Login({ searchParams }: { searchParams: { message: string } }) {
+import { SubmitButton } from '../../components/submit-button'
+import { createClient } from '@/utils/supabase/server'
+
+export default async function Login({
+  searchParams,
+}: {
+  searchParams: Promise<{ message?: string }>
+}) {
+  const { message } = await searchParams
   const signIn = async (formData: FormData) => {
     'use server'
 
@@ -27,7 +33,7 @@ export default function Login({ searchParams }: { searchParams: { message: strin
   const signUp = async (formData: FormData) => {
     'use server'
 
-    const origin = headers().get('origin')
+    const origin = (await headers()).get('origin')
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     const supabase = await createClient()
@@ -105,10 +111,8 @@ export default function Login({ searchParams }: { searchParams: { message: strin
         >
           Sign Up
         </SubmitButton>
-        {searchParams?.message && (
-          <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
-            {searchParams.message}
-          </p>
+        {message && (
+          <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">{message}</p>
         )}
       </form>
     </div>
