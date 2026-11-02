@@ -8,6 +8,7 @@ on:
       - 'examples/caching/with-cloudflare-workers-kv/**'
       - 'examples/user-management/nuxt3-user-management/**'
       - '.github/scripts/check-nuxt-security-example.mjs'
+      - '.github/scripts/check-worker-examples.mjs'
       - '.github/workflows/security-worker-nuxt-examples.yml'
 
 permissions:
@@ -28,9 +29,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '26'
-      - run: npm install --ignore-scripts --package-lock=false
+      - run: npm install --ignore-scripts
         working-directory: ${{ matrix.example }}
-      - run: npx --no-install wrangler publish --dry-run --outdir /tmp/worker-bundle
+      - run: node .github/scripts/check-worker-examples.mjs '${{ matrix.example }}'
+      - run: npm audit --audit-level=moderate
         working-directory: ${{ matrix.example }}
   nuxt-build-and-smoke:
     runs-on: ubuntu-24.04

@@ -2,12 +2,12 @@
   "name": "supabase-at-the-edge",
   "version": "0.0.0",
   "devDependencies": {
-    "wrangler": "2.20.2"
+    "wrangler": "^4.156.2"
   },
   "private": true,
   "scripts": {
     "start": "wrangler dev",
-    "deploy": "wrangler publish"
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2",
