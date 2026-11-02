@@ -1,0 +1,34 @@
+name: Svelte todo security migration checks
+
+on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - 'examples/todo-list/sveltejs-todo-list/**'
+      - '.github/workflows/security-svelte-todo.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  browser-and-types:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: examples/todo-list/sveltejs-todo-list
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: npm install --ignore-scripts
+      - run: npm run check
+      - run: npm audit --audit-level=moderate
+      - run: npx --no-install playwright install --with-deps chromium
+      - run: npm run test:security
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: svelte-todo-browser-evidence
+          path: examples/todo-list/sveltejs-todo-list/test-results
