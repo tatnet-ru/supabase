@@ -7,7 +7,8 @@
       "@/*": ["./app/*"]
     },
     "types": ["node", "vite/client"],
-    "rootDirs": [".", "./.react-router/types"]
+    "rootDirs": [".", "./.react-router/types"],
+    "jsx": "react-jsx"
   },
   "include": ["**/*", "**/.server/**/*", "**/.client/**/*", ".react-router/types/**/*"],
   "exclude": ["node_modules"]
