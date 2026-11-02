@@ -69,6 +69,8 @@ allowBuilds:
   api-types@file:packages/api-types: set this to true or false
   common@file:packages/common: set this to true or false
   config@file:packages/config: set this to true or false
+  # The SDK needs no postinstall; bt ships in its optional platform package.
+  braintrust: false
   contentlayer2: false
   core-js: false
   dev-tools@file:packages/dev-tools: set this to true or false
