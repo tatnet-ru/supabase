@@ -1,0 +1,42 @@
+name: Python image example security checks
+
+on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - 'examples/ai/image_search/**'
+      - 'examples/ai/aws_bedrock_image_search/**'
+      - '.github/workflows/security-python-examples.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-compatibility:
+    runs-on: macos-14
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [image_search, aws_bedrock_image_search]
+    defaults:
+      run:
+        working-directory: examples/ai/${{ matrix.example }}
+    env:
+      HF_HUB_DISABLE_TELEMETRY: '1'
+      DO_NOT_TRACK: '1'
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install poetry==2.5.1
+      - run: poetry check --lock
+      - uses: actions/cache@v4
+        if: matrix.example == 'image_search'
+        with:
+          path: ~/.cache/huggingface/hub
+          key: clip-vit-b32-public-model-v1
+      - run: poetry install --no-interaction
+      - run: poetry run python -m unittest discover -s tests -v
