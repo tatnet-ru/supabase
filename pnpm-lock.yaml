@@ -119,6 +119,7 @@ catalogs:
       version: 3.25.76
 
 overrides:
+  katex@<0.18.2: 0.18.2
   '@ardatan/relay-compiler>immutable': ^3.8.3
   monaco-editor: 0.52.2
   '@mapbox/node-pre-gyp>tar': ^7.5.21
@@ -14162,10 +14163,6 @@ packages:
     resolution: {integrity: sha512-ZZow9HBI5O6EPgSJLUb8n2NKgmVWTwCvHGwFuJlMjvLFqlGG6pjirPhtdsseaLZjSibD8eegzmYpUZwoIlj2cQ==}
     engines: {node: '>=4.0'}
 
-  katex@0.16.47:
-    resolution: {integrity: sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==}
-    hasBin: true
-
   katex@0.18.2:
     resolution: {integrity: sha512-3snve4y0SXTMequLim1FMiPvLGElySam0blN5xQZBqEY3lOJz1TnuaaiugnBZBqHzlSAGmFTYL7MCQkORuLKCA==}
     hasBin: true
@@ -19948,7 +19945,7 @@ snapshots:
       '@aws-sdk/core': 3.974.8
       '@aws-sdk/types': 3.973.8
       '@aws-sdk/util-arn-parser': 3.972.3
-      '@smithy/core': 3.31.1
+      '@smithy/core': 3.23.17
       '@smithy/node-config-provider': 4.3.14
       '@smithy/protocol-http': 5.3.14
       '@smithy/signature-v4': 5.3.14
@@ -19987,7 +19984,7 @@ snapshots:
       '@aws-sdk/util-user-agent-browser': 3.972.10
       '@aws-sdk/util-user-agent-node': 3.973.24
       '@smithy/config-resolver': 4.4.17
-      '@smithy/core': 3.31.1
+      '@smithy/core': 3.23.17
       '@smithy/fetch-http-handler': 5.3.17
       '@smithy/hash-node': 4.2.14
       '@smithy/invalid-dependency': 4.2.14
@@ -32207,10 +32204,6 @@ snapshots:
       object.assign: 4.1.7
       object.values: 1.2.1
 
-  katex@0.16.47:
-    dependencies:
-      commander: 8.3.0
-
   katex@0.18.2:
     dependencies:
       commander: 8.3.0
@@ -33085,7 +33078,7 @@ snapshots:
       dompurify: 3.4.17
       es-toolkit: 1.46.1
       fastdom: 1.0.12
-      katex: 0.16.47
+      katex: 0.18.2
       khroma: 2.1.0
       marked: 16.3.0
       roughjs: 4.6.6
@@ -33270,7 +33263,7 @@ snapshots:
     dependencies:
       '@types/katex': 0.16.7
       devlop: 1.1.0
-      katex: 0.16.47
+      katex: 0.18.2
       micromark-factory-space: 2.0.0
       micromark-util-character: 2.0.1
       micromark-util-symbol: 2.0.1
@@ -35912,7 +35905,7 @@ snapshots:
       '@types/katex': 0.16.7
       hast-util-from-html-isomorphic: 2.0.0
       hast-util-to-text: 4.0.0
-      katex: 0.16.47
+      katex: 0.18.2
       unist-util-visit-parents: 6.0.1
       vfile: 6.0.3
 
@@ -37032,7 +37025,7 @@ snapshots:
     dependencies:
       clsx: 2.1.1
       harden-react-markdown: 1.1.2(react-markdown@10.1.0(@types/react@19.2.14)(react@19.2.6)(supports-color@8.1.1))(react@19.2.6)
-      katex: 0.16.47
+      katex: 0.18.2
       lucide-react: 0.542.0(react@19.2.6)
       marked: 16.3.0
       mermaid: 11.17.2(supports-color@8.1.1)
