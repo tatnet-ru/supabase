@@ -103,7 +103,7 @@ export const CreateBranchModal = () => {
         'A branch with this name already exists'
       ),
     gitBranchName: z.string().optional(),
-    withData: z.boolean().default(false).optional(),
+    withData: z.boolean().optional(),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({

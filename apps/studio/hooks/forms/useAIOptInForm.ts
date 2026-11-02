@@ -18,7 +18,8 @@ import type { ResponseError } from '@/types'
 // Shared schema definition
 export const AIOptInSchema = z.object({
   aiOptInLevel: z.enum(['disabled', 'schema', 'schema_and_log', 'schema_and_log_and_data'], {
-    required_error: 'AI Opt-in level selection is required',
+    error: (issue) =>
+      issue.input === undefined ? 'AI Opt-in level selection is required' : undefined,
   }),
 })
 

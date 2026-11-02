@@ -16,7 +16,7 @@ import {
 import { z } from 'zod'
 
 const FormSchema = z.object({
-  marketing_emails: z.boolean().default(false).optional(),
+  marketing_emails: z.boolean().optional(),
   security_emails: z.boolean(),
 })
 

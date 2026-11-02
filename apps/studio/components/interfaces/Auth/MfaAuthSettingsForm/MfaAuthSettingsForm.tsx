@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
@@ -15,6 +14,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  formOutputResolver,
   Input,
   InputGroup,
   InputGroupAddon,
@@ -82,7 +82,7 @@ const totpSchema = z.object({
   MFA_TOTP: z.string().min(1, 'Required'),
   MFA_MAX_ENROLLED_FACTORS: preprocessEmptyNumberInput(
     z.coerce
-      .number({ required_error: 'Required', invalid_type_error: 'Required' })
+      .number({ error: (issue) => (issue.input === undefined ? 'Required' : 'Required') })
       .min(0, 'Must be a value 0 or larger')
       .max(30, 'Must be a value no greater than 30')
   ),
@@ -94,7 +94,7 @@ const phoneSchema = z.object({
   MFA_PHONE: z.string().min(1, 'Required'),
   MFA_PHONE_OTP_LENGTH: preprocessEmptyNumberInput(
     z.coerce
-      .number({ required_error: 'Required', invalid_type_error: 'Required' })
+      .number({ error: (issue) => (issue.input === undefined ? 'Required' : 'Required') })
       .min(6, 'Must be a value 6 or larger')
       .max(30, 'must be a value no greater than 30')
   ),
@@ -104,7 +104,9 @@ const phoneSchema = z.object({
 type PhoneFormValues = z.infer<typeof phoneSchema>
 
 const securitySchema = z.object({
-  MFA_ALLOW_LOW_AAL: z.boolean({ required_error: 'Required' }),
+  MFA_ALLOW_LOW_AAL: z.boolean({
+    error: (issue) => (issue.input === undefined ? 'Required' : undefined),
+  }),
 })
 type SecurityFormValues = z.infer<typeof securitySchema>
 
@@ -155,7 +157,7 @@ export const MfaAuthSettingsForm = () => {
   const hasValidMFAProvider = hasValidMFAPhoneProvider || sendSMSHookIsEnabled
 
   const totpForm = useForm<TotpFormValues>({
-    resolver: zodResolver(totpSchema),
+    resolver: formOutputResolver(totpSchema),
     defaultValues: {
       MFA_TOTP: 'Enabled',
       MFA_MAX_ENROLLED_FACTORS: 10,
@@ -164,7 +166,7 @@ export const MfaAuthSettingsForm = () => {
   const { reset: resetTotpForm } = totpForm
 
   const phoneForm = useForm<PhoneFormValues>({
-    resolver: zodResolver(phoneSchema),
+    resolver: formOutputResolver(phoneSchema),
     defaultValues: {
       MFA_PHONE: 'Disabled',
       MFA_PHONE_OTP_LENGTH: 6,
@@ -175,7 +177,7 @@ export const MfaAuthSettingsForm = () => {
   const mfaPhoneValue = useWatch({ control: phoneForm.control, name: 'MFA_PHONE' })
 
   const securityForm = useForm<SecurityFormValues>({
-    resolver: zodResolver(securitySchema),
+    resolver: formOutputResolver(securitySchema),
     defaultValues: {
       MFA_ALLOW_LOW_AAL: false,
     },

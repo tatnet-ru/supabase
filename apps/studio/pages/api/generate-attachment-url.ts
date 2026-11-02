@@ -12,7 +12,8 @@ const GenerateAttachmentUrlSchema = z.object({
   filenames: z.array(z.string()),
   bucket: z
     .enum(['support-attachments', 'feedback-attachments', DASHBOARD_LOG_BUCKET])
-    .default('support-attachments'),
+    .nonoptional()
+    .prefault('support-attachments'),
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {

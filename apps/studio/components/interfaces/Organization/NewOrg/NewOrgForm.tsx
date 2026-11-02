@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
@@ -16,6 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Select,
   SelectContent,
   SelectItem,
@@ -144,7 +144,7 @@ export const NewOrgForm = ({
   })
 
   const form = useForm<FormState>({
-    resolver: zodResolver(formSchema),
+    resolver: formOutputResolver(formSchema),
     defaultValues: {
       plan: defaultValues.plan.toUpperCase() as (typeof plans)[number],
       name: defaultValues.name,

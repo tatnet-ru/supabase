@@ -1,14 +1,14 @@
 import { createRequire } from 'node:module'
-import type { VercelConfig } from '@vercel/config/v1'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import type { VercelConfig } from './vercel'
 
 // Compile with the routing utilities consumed by the installed Vercel config SDK.
 const require = createRequire(import.meta.url)
-const vercelRequire = createRequire(require.resolve('@vercel/config/v1'))
 const getTransformedRoutes: (config: { headers: VercelConfig['headers'] }) => {
   error: unknown
   routes: { src?: string; headers?: Record<string, string> }[] | null
-} = vercelRequire('@vercel/routing-utils').getTransformedRoutes
+} = require('@vercel/routing-utils').getTransformedRoutes
 
 afterEach(() => {
   vi.unstubAllEnvs()

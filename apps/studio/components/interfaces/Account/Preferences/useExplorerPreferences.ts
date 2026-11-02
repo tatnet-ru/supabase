@@ -11,7 +11,7 @@ const preferencesSchema = z.object({
   home: explorerHomeSchema.catch('home'),
   hasCompletedOnboarding: z.boolean().catch(false),
 })
-const accountsSchema = z.record(z.unknown())
+const accountsSchema = z.record(z.string(), z.unknown())
 const defaultPreferences = preferencesSchema.parse({})
 
 export const useExplorerPreferences = () => {

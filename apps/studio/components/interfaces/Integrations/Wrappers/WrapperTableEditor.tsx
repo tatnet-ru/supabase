@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from 'lucide-react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
@@ -18,6 +17,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  dynamicFormResolver,
   Form,
   FormControl,
   FormField,
@@ -308,9 +308,9 @@ const TableForm = ({
   const formSchema = getTableFormSchema(table)
   type FormSchema = z.infer<typeof formSchema>
 
-  const form = useForm<FormSchema>({
+  const form = useForm<FieldValues, unknown, FormSchema>({
     defaultValues,
-    resolver: zodResolver(formSchema),
+    resolver: dynamicFormResolver(formSchema),
   })
 
   const {

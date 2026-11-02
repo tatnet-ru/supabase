@@ -36,7 +36,8 @@ const mcpQuerySchema = z.object({
     )
     .pipe(z.array(supportedFeatureGroupSchema).optional()),
   read_only: zBooleanString()
-    .default('false')
+    .nonoptional()
+    .prefault('false')
     .describe(
       'Indicates whether or not the MCP server should operate in read-only mode. This prevents write operations on any of your databases by executing SQL as a read-only Postgres user.'
     ),

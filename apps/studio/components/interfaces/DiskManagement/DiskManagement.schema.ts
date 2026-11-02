@@ -25,7 +25,8 @@ const baseSchema = z.object({
   computeSize: computeInstanceAddonVariantIdSchema
     .describe('Compute size')
     .optional()
-    .default('ci_micro'),
+    .nonoptional()
+    .prefault('ci_micro'),
   growthPercent: z
     .number()
     .int('Value must be an integer')

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Loader2Icon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
@@ -14,6 +13,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   Switch,
 } from 'ui'
@@ -130,12 +130,12 @@ export const GitHubIntegrationConnectionForm = ({
   const GitHubSettingsSchema = z
     .object({
       repositoryId: z.string().min(1, 'Please select a repository'),
-      enableProductionSync: z.boolean().default(true),
-      branchName: z.string().default('main'),
-      new_branch_per_pr: z.boolean().default(true),
-      supabaseDirectory: z.string().default('.'),
-      supabaseChangesOnly: z.boolean().default(true),
-      branchLimit: z.string().default('50'),
+      enableProductionSync: z.boolean().nonoptional().prefault(true),
+      branchName: z.string().nonoptional().prefault('main'),
+      new_branch_per_pr: z.boolean().nonoptional().prefault(true),
+      supabaseDirectory: z.string().nonoptional().prefault('.'),
+      supabaseChangesOnly: z.boolean().nonoptional().prefault(true),
+      branchLimit: z.string().nonoptional().prefault('50'),
     })
     .superRefine(async (val, ctx) => {
       if (val.enableProductionSync && val.branchName && val.branchName.length > 0) {
@@ -174,7 +174,7 @@ export const GitHubIntegrationConnectionForm = ({
     : undefined
 
   const githubSettingsForm = useForm<z.infer<typeof GitHubSettingsSchema>>({
-    resolver: zodResolver(GitHubSettingsSchema),
+    resolver: formOutputResolver(GitHubSettingsSchema),
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
     defaultValues: {

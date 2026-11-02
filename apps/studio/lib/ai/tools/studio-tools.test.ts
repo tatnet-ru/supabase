@@ -1,5 +1,6 @@
 import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 import { createUpdateOptInLevelInputSchema, getOptInTools, getStudioTools } from './studio-tools'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -92,7 +93,7 @@ describe('ai/tools/studio-tools', () => {
       // Verify the schema exists and is a Zod object
       const schema = executeSqlTool.inputSchema
       expect(schema).toBeDefined()
-      expect((schema as any)._def.typeName).toBe('ZodObject')
+      expect(schema).toBeInstanceOf(z.ZodObject)
     })
 
     it('should have deploy_edge_function with input schema', () => {
@@ -103,7 +104,7 @@ describe('ai/tools/studio-tools', () => {
 
       // Verify the schema exists and is a Zod object
       expect(deployTool.inputSchema).toBeDefined()
-      expect((deployTool.inputSchema as any)._def.typeName).toBe('ZodObject')
+      expect(deployTool.inputSchema).toBeInstanceOf(z.ZodObject)
     })
 
     it('should have rename_chat with execute function', async () => {

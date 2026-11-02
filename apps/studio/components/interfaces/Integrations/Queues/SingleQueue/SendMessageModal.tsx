@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -15,6 +14,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -33,7 +33,7 @@ interface SendMessageModalProps {
 }
 
 const FormSchema = z.object({
-  delay: z.coerce.number().int().gte(0).default(5),
+  delay: z.coerce.number().int().gte(0).nonoptional().prefault(5),
   payload: z.string().refine(
     (val) => {
       try {
@@ -57,7 +57,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
   const { childId: queueName } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const form = useForm<SendMessageForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: {
       delay: 1,
       payload: '{}',

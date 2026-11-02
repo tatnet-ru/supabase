@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM } from 'common'
 import Link from 'next/link'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
@@ -12,6 +11,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  formOutputResolver,
   Input,
   RadioGroupCard,
   RadioGroupCardItem,
@@ -151,8 +151,8 @@ const otlpFields = {
     invalidMessage: 'OTLP endpoint must be a valid URL',
     prefixMessage: 'OTLP endpoint must start with http:// or https://',
   }),
-  protocol: z.string().optional().default('http/protobuf'),
-  gzip: z.boolean().optional().default(true),
+  protocol: z.string().optional().nonoptional().prefault('http/protobuf'),
+  gzip: z.boolean().optional().nonoptional().prefault(true),
 }
 
 const otlpFormSchema = z.object({
@@ -173,7 +173,7 @@ const syslogSchema = z.object({
     .int({ message: 'Port must be an integer' })
     .min(0, { message: 'Port must be between 0 and 65535' })
     .max(65535, { message: 'Port must be between 0 and 65535' }),
-  tls: z.boolean().optional().default(false),
+  tls: z.boolean().optional().nonoptional().prefault(false),
   structured_data: z.string().optional(),
   cipher_key: z.string().optional(),
   ca_cert: z.string().optional(),
@@ -370,7 +370,7 @@ export function LogDrainDestinationSheetForm({
   }, [defaultValues, mode, defaultHeaderEntries, defaultType])
 
   const form = useForm<LogDrainDestinationFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: formOutputResolver(formSchema),
     values: formValues,
   })
 

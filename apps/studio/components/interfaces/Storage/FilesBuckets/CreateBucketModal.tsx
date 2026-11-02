@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
@@ -16,6 +15,7 @@ import {
   FormControl,
   FormField,
   FormMessage,
+  formOutputResolver,
   Input,
   Select,
   SelectContent,
@@ -84,7 +84,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const isSaving = isCreatingBucket || isUpdatingLifecycle
 
   const form = useForm<BucketFormValues>({
-    resolver: zodResolver(BucketFormSchema),
+    resolver: formOutputResolver(BucketFormSchema),
     defaultValues: DEFAULT_VALUES,
     // Show numeric versioning bounds as the user types, not only on submit
     mode: 'onChange',

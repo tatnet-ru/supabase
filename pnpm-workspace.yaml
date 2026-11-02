@@ -58,9 +58,11 @@ catalog:
   vite: ^8.3.5
   velite: ^0.4.0
   vitest: ^5.0.5
-  zod: 3.25.76
+  zod: 4.6.7
 
 allowBuilds:
+  # Published JS is prebuilt; skip the repository-only package-manager guard.
+  autoevals: false
   '@parcel/watcher': false
   '@sentry/cli': false
   '@supabase/build-icons@file:packages/build-icons': set this to true or false
@@ -118,6 +120,8 @@ minimumReleaseAgeExclude:
   - '@tanstack/store@0.11.2'
 
 overrides:
+  # Keep OpenAI's optional WebSocket peer in one context across workspace SDK users.
+  'ws@8': 8.22.0
   # Codegen/loaders still request v10; use the patched utility API consistently.
   '@graphql-tools/utils@10': 12.0.3
   # markdown-toc only needs front-matter parsing; gray-matter v4 removes

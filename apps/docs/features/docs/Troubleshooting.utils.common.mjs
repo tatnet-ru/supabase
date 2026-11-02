@@ -97,7 +97,7 @@ export const TroubleshootingSchema = z
       .optional(),
     database_id: z.string().default(`pseudo-${uuidv4()}`),
     github_url: z.string().url().optional(),
-    date_created: z.date({ coerce: true }).optional(),
+    date_created: z.coerce.date().optional(),
   })
   .strict()
 
@@ -129,10 +129,9 @@ export async function getAllTroubleshootingEntriesInternal() {
 
     const parseResult = validateTroubleshootingMetadata(frontmatter)
     if ('error' in parseResult) {
-      throw Error(
-        `Error validating troubleshooting metadata for ${filePath}`,
-        { cause: parseResult.error }
-      )
+      throw Error(`Error validating troubleshooting metadata for ${filePath}`, {
+        cause: parseResult.error,
+      })
     }
 
     const mdxTree = fromMarkdown(content, {

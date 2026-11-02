@@ -57,7 +57,10 @@ const captchaEnabledSchema = z
     SECURITY_CAPTCHA_ENABLED: z.literal(true),
     SECURITY_CAPTCHA_SECRET: z.string().min(1, 'Must have a Captcha secret'),
     SECURITY_CAPTCHA_PROVIDER: z.enum(['hcaptcha', 'turnstile'], {
-      required_error: 'Captcha provider must be either hcaptcha or turnstile',
+      error: (issue) =>
+        issue.input === undefined
+          ? 'Captcha provider must be either hcaptcha or turnstile'
+          : undefined,
     }),
   })
   .merge(baseSchema)

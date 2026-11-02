@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
@@ -7,7 +6,7 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, SidePanel } from 'ui'
+import { Button, Form, formOutputResolver, SidePanel } from 'ui'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
@@ -134,7 +133,7 @@ export const EditHookPanel = () => {
   const restUrl = project?.restUrl
 
   const form = useForm<WebhookFormValues>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: {
       name: selectedHook?.name ?? '',
       table_id: selectedHook?.table_id?.toString() ?? '',

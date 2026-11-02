@@ -24,7 +24,8 @@ import { z } from 'zod'
 const FormSchema = z.object({
   email: z
     .string({
-      required_error: 'Please select an email to display.',
+      error: (issue) =>
+        issue.input === undefined ? 'Please select an email to display.' : undefined,
     })
     .email(),
 })

@@ -16,97 +16,99 @@ const tableSchema = z
   })
   .passthrough() // passthrough is needed for table options
 
+function withOptionSchemas<T extends z.ZodRawShape>(
+  fields: T,
+  options: { name: string; required: boolean }[]
+): z.ZodObject<T, z.core.$loose>
+function withOptionSchemas(fields: z.ZodRawShape, options: { name: string; required: boolean }[]) {
+  const shape: Record<string, z.ZodType> = {}
+  for (const option of options) {
+    shape[option.name] = option.required ? z.string().min(1, 'Required') : z.string().optional()
+  }
+  return z.looseObject({ ...shape, ...fields })
+}
+
+function stripExtraFields<T extends Record<string, unknown>>(values: T, keys: string[]): T {
+  const allowed = new Set(keys)
+  for (const key of Object.keys(values)) {
+    if (!allowed.has(key)) delete values[key]
+  }
+  return values
+}
+
 export const getWrapperCreationFormSchema = (wrapperMeta: WrapperMeta) => {
-  let wrapperSchema = {
-    // Common validation for all wrappers
-    server_name: z.string().min(1, 'Please provide a name for your server'),
-  } as Record<string, z.ZodTypeAny>
-
-  // Add wrapper specific options
-  wrapperMeta.server.options.forEach((option) => {
-    if (option.required) {
-      wrapperSchema[option.name] = z.string().min(1, 'Required')
-      return
-    }
-    wrapperSchema[option.name] = z.string().optional()
-  })
-
-  return z.discriminatedUnion('mode', [
-    z
-      .object({
-        mode: z.literal('tables'),
-        tables: z
-          .array(tableSchema, { required_error: 'Please provide at least one table' })
-          .min(1, 'Please provide at least one table'),
-      })
-      .merge(z.object(wrapperSchema)),
-    z
-      .object({
-        mode: z.literal('schema'),
-        source_schema: z.string().min(1, 'Please provide a source schema'),
-        target_schema: z.string().min(1, 'Please provide an unique target schema'),
-      })
-      .merge(z.object(wrapperSchema)),
-  ])
+  const common = { server_name: z.string().min(1, 'Please provide a name for your server') }
+  return z
+    .discriminatedUnion('mode', [
+      withOptionSchemas(
+        {
+          ...common,
+          mode: z.literal('tables'),
+          tables: z
+            .array(tableSchema, {
+              error: (issue) =>
+                issue.input === undefined ? 'Please provide at least one table' : undefined,
+            })
+            .min(1, 'Please provide at least one table'),
+        },
+        wrapperMeta.server.options
+      ),
+      withOptionSchemas(
+        {
+          ...common,
+          mode: z.literal('schema'),
+          source_schema: z.string().min(1, 'Please provide a source schema'),
+          target_schema: z.string().min(1, 'Please provide an unique target schema'),
+        },
+        wrapperMeta.server.options
+      ),
+    ])
+    .transform((values) =>
+      stripExtraFields(values, [
+        'server_name',
+        'mode',
+        ...(values.mode === 'tables' ? ['tables'] : ['source_schema', 'target_schema']),
+        ...wrapperMeta.server.options.map((option) => option.name),
+      ])
+    )
 }
 
-export const getEditionFormSchema = (wrapperMeta: WrapperMeta) => {
-  let wrapperSchema = {
-    // Common validation for all wrappers
-    server_name: z.string().min(1, 'Please provide a name for your server'),
-    tables: z
-      .array(tableSchema, { required_error: 'Please provide at least one table' })
-      .min(1, 'Please provide at least one table'),
-  } as Record<string, z.ZodTypeAny>
-
-  // Add wrapper specific options
-  wrapperMeta.server.options.forEach((option) => {
-    if (option.required) {
-      wrapperSchema[option.name] = z.string().min(1, 'Required')
-      return
-    }
-    wrapperSchema[option.name] = z.string().optional()
-  })
-  return z.object(wrapperSchema)
-}
-
-export const getTableFormSchema = (table: Table) => {
-  let tableSchema = {
-    table_name: z.string().min(1, 'Required'),
-    schema: z.string().min(1, 'Required'),
-    schema_name: z.string().optional(),
-    columns: z.array(
-      z.object({
-        name: z.string().min(1, 'Required'),
-        type: z.string().min(1, 'Required'),
-      })
-    ),
-  } as Record<string, z.ZodTypeAny>
-
-  table.options.forEach((option) => {
-    if (option.required) {
-      tableSchema[option.name] = z.string().min(1, 'Required')
-      return
-    }
-    tableSchema[option.name] = z.string().optional()
-  })
-
-  return (
-    z
-      .object(tableSchema)
-      // passthrough is needed for table options
-      .passthrough()
-      .superRefine((values, ctx) => {
-        if (values.schema === 'custom' && !values.schema_name) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['schema_name'],
-            message: 'Required',
-          })
-        }
-      })
+export const getEditionFormSchema = (wrapperMeta: WrapperMeta) =>
+  withOptionSchemas(
+    {
+      server_name: z.string().min(1, 'Please provide a name for your server'),
+      tables: z
+        .array(tableSchema, {
+          error: (issue) =>
+            issue.input === undefined ? 'Please provide at least one table' : undefined,
+        })
+        .min(1, 'Please provide at least one table'),
+    },
+    wrapperMeta.server.options
+  ).transform((values) =>
+    stripExtraFields(values, [
+      'server_name',
+      'tables',
+      ...wrapperMeta.server.options.map((option) => option.name),
+    ])
   )
-}
+
+export const getTableFormSchema = (table: Table) =>
+  withOptionSchemas(
+    {
+      table_name: z.string().min(1, 'Required'),
+      schema: z.string().min(1, 'Required'),
+      schema_name: z.string().optional(),
+      columns: z.array(
+        z.object({ name: z.string().min(1, 'Required'), type: z.string().min(1, 'Required') })
+      ),
+    },
+    table.options
+  ).superRefine((values, ctx) => {
+    if (values.schema === 'custom' && !values.schema_name) {
+      ctx.addIssue({ code: 'custom', path: ['schema_name'], message: 'Required' })
+    }
+  })
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null

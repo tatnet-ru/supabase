@@ -99,19 +99,25 @@ const PROVIDER_EMAIL = {
       PASSWORD_HIBP_ENABLED: z.boolean(),
       MAILER_OTP_EXP: preprocessEmptyNumberInput(
         z.coerce
-          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .number({
+            error: (issue) => (issue.input === undefined ? 'This is required' : 'This is required'),
+          })
           .min(0, 'Must be greater or equal to 0')
           .max(86400, 'Must be no more than 86400')
       ),
       MAILER_OTP_LENGTH: preprocessEmptyNumberInput(
         z.coerce
-          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .number({
+            error: (issue) => (issue.input === undefined ? 'This is required' : 'This is required'),
+          })
           .min(6, 'Must be greater or equal to 6')
           .max(10, 'Must be no more than 10')
       ),
       PASSWORD_MIN_LENGTH: preprocessEmptyNumberInput(
         z.coerce
-          .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+          .number({
+            error: (issue) => (issue.input === undefined ? 'This is required' : 'This is required'),
+          })
           .min(6, 'Must be greater or equal to 6')
       ),
       PASSWORD_REQUIRED_CHARACTERS: z.string(),
@@ -160,12 +166,16 @@ const getSmsOtpPhoneProviderSchema = (optional = false) =>
   z.object({
     SMS_OTP_EXP: preprocessEmptyNumberInput(
       z.coerce
-        .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+        .number({
+          error: (issue) => (issue.input === undefined ? 'This is required' : 'This is required'),
+        })
         .min(0, 'Must be 0 or larger')
     ),
     SMS_OTP_LENGTH: preprocessEmptyNumberInput(
       z.coerce
-        .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
+        .number({
+          error: (issue) => (issue.input === undefined ? 'This is required' : 'This is required'),
+        })
         .min(6, 'Must be 6 or larger')
     ),
     SMS_TEMPLATE: optional ? z.string() : z.string().min(1, 'SMS Template is required'),
@@ -333,7 +343,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
     .discriminatedUnion(
       'SMS_PROVIDER',
       [twilioSchema, twilioVerifySchema, messagebirdSchema, vonageSchema, textlocalSchema],
-      { message: 'Invalid SMS provider', invalid_type_error: 'Invalid SMS provider' }
+      { error: 'Invalid SMS provider' }
     )
     .superRefine((values, ctx) => {
       if (values.SMS_TEST_OTP && !values.SMS_TEST_OTP_VALID_UNTIL) {
@@ -356,7 +366,7 @@ export const getPhoneProviderValidationSchema = (config: ProjectAuthConfigData) 
       // Trick: use superRefine to conditionally parse the enabled schema
       .superRefine((values) => {
         if (values.EXTERNAL_PHONE_ENABLED === true) {
-          return enabledSchema.parse(values)
+          enabledSchema.parse(values)
         }
       })
       // Trick: use transform to ensure the correct shape when EXTERNAL_PHONE_ENABLED is true.

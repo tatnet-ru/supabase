@@ -1,6 +1,6 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { formOutputResolver } from 'ui'
 import { Check, Copy } from 'lucide-react'
 // Required to avoid issue:
 // The inferred type of ConfirmationModal cannot be named without a reference to DialogProps
@@ -95,14 +95,14 @@ export const TextConfirmModal = forwardRef<
       confirmValue: z.preprocess(
         (val) => (typeof val === 'string' ? val.trim() : val),
         z.literal(confirmString.trim(), {
-          errorMap: () => ({ message: errorMessage }),
+          error: errorMessage,
         })
       ),
     })
 
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
-      resolver: zodResolver(formSchema),
+      resolver: formOutputResolver(formSchema),
       reValidateMode: 'onChange',
       defaultValues: {
         confirmValue: '',

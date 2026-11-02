@@ -24,8 +24,8 @@ const CommonFormSchema = z.object({
   maxFillMs: requiredNumberInputSchema(
     z
       .number({
-        required_error: BATCH_WAIT_TIME_MIN_ERROR,
-        invalid_type_error: BATCH_WAIT_TIME_MIN_ERROR,
+        error: (issue) =>
+          issue.input === undefined ? BATCH_WAIT_TIME_MIN_ERROR : BATCH_WAIT_TIME_MIN_ERROR,
       })
       .int('Batch wait time must be a whole number of milliseconds.')
       .min(0, BATCH_WAIT_TIME_MIN_ERROR)
@@ -33,8 +33,10 @@ const CommonFormSchema = z.object({
   maxTableSyncWorkers: requiredNumberInputSchema(
     z
       .number({
-        required_error: MAX_TABLE_SYNC_WORKERS_MIN_ERROR,
-        invalid_type_error: MAX_TABLE_SYNC_WORKERS_MIN_ERROR,
+        error: (issue) =>
+          issue.input === undefined
+            ? MAX_TABLE_SYNC_WORKERS_MIN_ERROR
+            : MAX_TABLE_SYNC_WORKERS_MIN_ERROR,
       })
       .min(1, MAX_TABLE_SYNC_WORKERS_MIN_ERROR)
       .int('Max table sync workers must be a whole number.')
@@ -42,8 +44,10 @@ const CommonFormSchema = z.object({
   maxCopyConnectionsPerTable: requiredNumberInputSchema(
     z
       .number({
-        required_error: MAX_COPY_CONNECTIONS_MIN_ERROR,
-        invalid_type_error: MAX_COPY_CONNECTIONS_MIN_ERROR,
+        error: (issue) =>
+          issue.input === undefined
+            ? MAX_COPY_CONNECTIONS_MIN_ERROR
+            : MAX_COPY_CONNECTIONS_MIN_ERROR,
       })
       .int()
       .min(1, MAX_COPY_CONNECTIONS_MIN_ERROR)

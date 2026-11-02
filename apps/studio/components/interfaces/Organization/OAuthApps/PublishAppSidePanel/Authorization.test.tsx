@@ -1,7 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { Form } from 'ui'
+import { Form, formOutputResolver } from 'ui'
 import { describe, expect, test, vi } from 'vitest'
 import z from 'zod'
 
@@ -34,7 +33,7 @@ describe('OneTimeWithConfirmToggle', () => {
   }) => {
     const form = useForm<Schema>({
       defaultValues,
-      resolver: zodResolver(schema),
+      resolver: formOutputResolver(schema),
     })
 
     return (

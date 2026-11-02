@@ -18,7 +18,7 @@ const selectedLogSchema = z
     ]),
     event_message: z.string(),
     metadata: z
-      .record(z.unknown())
+      .record(z.string(), z.unknown())
       .nullish()
       .transform((value) => value ?? undefined),
   })

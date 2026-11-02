@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
@@ -12,6 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   Select,
   SelectContent,
@@ -75,7 +75,7 @@ export const DeployComputeInstanceDialog = ({
 }: DeployComputeInstanceDialogProps) => {
   const form = useForm<DeployComputeInstanceFormValues>({
     mode: 'onBlur',
-    resolver: zodResolver(DeployComputeInstanceFormSchema),
+    resolver: formOutputResolver(DeployComputeInstanceFormSchema),
     defaultValues: { ...DEFAULT_VALUES, name: generateComputeInstanceName() },
   })
 

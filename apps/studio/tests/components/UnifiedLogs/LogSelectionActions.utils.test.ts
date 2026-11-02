@@ -134,7 +134,7 @@ describe('parseSelectedLogs', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues).toEqual([
-        expect.objectContaining({ code: 'not_finite', path: [1, 'timestamp'] }),
+        expect.objectContaining({ code: 'invalid_union', path: [1, 'timestamp'] }),
       ])
     }
   })

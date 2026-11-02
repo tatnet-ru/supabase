@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { acceptUntrustedSql, joinSqlFragments, untrustedSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
@@ -8,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, cn, Form, useWatch } from 'ui'
+import { Button, cn, Form, formOutputResolver, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
@@ -162,7 +161,7 @@ export const ProjectCreationForm = ({
   const [projectCreationError, setProjectCreationError] = useState<string>()
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     mode: 'onChange',
     defaultValues: {
       organization: slug,

@@ -45,7 +45,7 @@ withTestDatabase('list with system schemas', async ({ executeQuery }) => {
 
 withTestDatabase('list without system schemas', async ({ executeQuery }) => {
   const { sql, zod } = await pgMeta.schemas.list({ includeSystemSchemas: false })
-  const rq = await executeQuery<typeof zod._type>(sql)
+  const rq = await executeQuery<ReturnType<typeof zod.parse>>(sql)
   const res = zod.parse(rq)
 
   expect(res.find(({ name }) => name === 'pg_catalog')).toMatchInlineSnapshot(`undefined`)

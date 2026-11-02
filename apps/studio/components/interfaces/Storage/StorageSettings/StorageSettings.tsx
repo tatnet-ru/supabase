@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
@@ -13,6 +12,7 @@ import {
   FormControl,
   FormField,
   FormMessage,
+  formOutputResolver,
   Input,
   Select,
   SelectContent,
@@ -141,7 +141,7 @@ export const StorageSettings = () => {
     })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: {
       fileSizeLimit: 0,
       unit: StorageSizeUnits.MB,

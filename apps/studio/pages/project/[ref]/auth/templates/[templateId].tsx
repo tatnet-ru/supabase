@@ -137,11 +137,9 @@ const RedirectToTemplates = () => {
   const showConfigurationSection = isSecurityTemplate && templateEnabledKey
 
   // Create form schema for security templates
-  const TemplateFormSchema = templateEnabledKey
-    ? z.object({
-        [templateEnabledKey]: z.boolean(),
-      })
-    : z.object({})
+  const templateShape: Record<string, z.ZodBoolean> = {}
+  if (templateEnabledKey) templateShape[templateEnabledKey] = z.boolean()
+  const TemplateFormSchema = z.object(templateShape)
 
   const defaultValues = templateEnabledKey
     ? {

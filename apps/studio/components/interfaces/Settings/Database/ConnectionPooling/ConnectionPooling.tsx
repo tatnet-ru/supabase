@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { capitalize } from 'lodash'
@@ -16,6 +15,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -119,7 +119,7 @@ export const ConnectionPooling = () => {
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
 
   const form = useForm<z.infer<typeof PoolingConfigurationFormSchema>>({
-    resolver: zodResolver(PoolingConfigurationFormSchema),
+    resolver: formOutputResolver(PoolingConfigurationFormSchema),
     defaultValues: {
       default_pool_size: undefined,
       max_client_conn: undefined,

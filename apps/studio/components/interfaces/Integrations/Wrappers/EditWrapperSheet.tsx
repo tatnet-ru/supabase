@@ -1,11 +1,12 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { compact } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
+import type { FieldValues } from 'react-hook-form'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  dynamicFormResolver,
   Form,
   FormControl,
   FormField,
@@ -89,9 +90,9 @@ export const EditWrapperSheet = ({
 
   const formSchema = getEditionFormSchema(wrapperMeta)
   type FormSchema = z.infer<typeof formSchema>
-  const form = useForm<FormSchema>({
+  const form = useForm<FieldValues, unknown, FormSchema>({
     defaultValues: initialValues,
-    resolver: zodResolver(formSchema),
+    resolver: dynamicFormResolver(formSchema),
   })
 
   const { getValues, resetField, setError } = form

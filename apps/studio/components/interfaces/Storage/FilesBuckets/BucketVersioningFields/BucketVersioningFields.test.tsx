@@ -1,8 +1,7 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { screen, waitForElementToBeRemoved, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
-import { Form } from 'ui'
+import { Form, formOutputResolver } from 'ui'
 import { describe, expect, test } from 'vitest'
 
 import { BucketFormSchema, type BucketFormValues } from '../FilesBucket.schema'
@@ -36,7 +35,7 @@ const Harness = ({
   policyError?: { message: string } | null
 }) => {
   const form = useForm<BucketFormValues>({
-    resolver: zodResolver(BucketFormSchema),
+    resolver: formOutputResolver(BucketFormSchema),
     defaultValues: { ...DEFAULT_VALUES, ...defaultValues },
     mode: 'onChange',
   })

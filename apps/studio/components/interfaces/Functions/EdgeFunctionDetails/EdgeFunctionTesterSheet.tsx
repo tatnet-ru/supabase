@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { BookOpenIcon, Loader2Icon, SendIcon } from 'lucide-react'
@@ -10,6 +9,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Label,
   ResizableHandle,
   ResizablePanel,
@@ -126,7 +126,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const url = `${protocol}://${endpoint}/functions/v1/${functionSlug}`
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: {
       method: 'POST',
       body: '{ "name": "Functions" }',

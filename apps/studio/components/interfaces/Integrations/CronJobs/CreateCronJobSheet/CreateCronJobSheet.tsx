@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -10,6 +9,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -137,7 +137,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
   }
 
   const form = useForm<CreateCronJobForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues,
   })
 

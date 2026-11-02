@@ -1,6 +1,6 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { formOutputResolver } from 'ui'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -162,7 +162,7 @@ export default function PageLayoutAuthEmails() {
 
 function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
   const notificationsForm = useForm<z.infer<typeof NotificationsFormSchema>>({
-    resolver: zodResolver(NotificationsFormSchema),
+    resolver: formOutputResolver(NotificationsFormSchema),
     defaultValues: {
       MAILER_NOTIFICATIONS_PASSWORD_CHANGED_ENABLED: true,
       MAILER_NOTIFICATIONS_EMAIL_CHANGED_ENABLED: true,
@@ -305,7 +305,7 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
 
 function SmtpPage() {
   const form = useForm<z.infer<typeof SmtpFormSchema>>({
-    resolver: zodResolver(SmtpFormSchema),
+    resolver: formOutputResolver(SmtpFormSchema),
     defaultValues: {
       ENABLE_SMTP: false,
       SMTP_ADMIN_EMAIL: '',

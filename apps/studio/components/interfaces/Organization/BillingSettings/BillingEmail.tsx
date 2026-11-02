@@ -1,11 +1,10 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, FormMessage, Input } from 'ui'
+import { Form, FormControl, FormField, FormMessage, formOutputResolver, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
@@ -32,7 +31,12 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
   billingEmail: z.string().email('Please provide a valid email address').optional(),
-  additionalBillingEmails: z.string().email({ message: 'invalid_email' }).array().default([]),
+  additionalBillingEmails: z
+    .string()
+    .email({ message: 'invalid_email' })
+    .array()
+    .nonoptional()
+    .prefault([]),
 })
 
 const BillingEmail = () => {
@@ -60,7 +64,7 @@ const BillingEmail = () => {
     )
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: formOutputResolver(formSchema),
     defaultValues: {
       billingEmail: customerProfile?.email ?? '',
       additionalBillingEmails: customerProfile?.additional_emails ?? [],

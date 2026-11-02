@@ -47,7 +47,8 @@ export const executeSqlInputSchema = z.object({
     .describe('Chart configuration for rendering the results'),
   isWriteQuery: z
     .boolean()
-    .default(false)
+    .nonoptional()
+    .prefault(false)
     .describe(
       'Whether the SQL statement performs a write operation or has side effects. Set true for INSERT/UPDATE/DELETE/DDL and for SELECT statements that call side-effecting functions, such as select cron.schedule(...), cron.unschedule(...), or functions that create, modify, schedule, enqueue, notify, or trigger work.'
     ),

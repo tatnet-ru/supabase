@@ -42,7 +42,7 @@ import { join } from 'node:path'
 import prettier from 'prettier'
 import { type Parent } from 'unist'
 import { visitParents } from 'unist-util-visit-parents'
-import { z, type SafeParseError } from 'zod'
+import { z, type ZodSafeParseError } from 'zod'
 
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
 import { IS_PLATFORM } from '~/lib/constants'
@@ -54,7 +54,8 @@ const ALLOW_LISTED_GITHUB_ORGS = ['supabase', 'supabase-community'] as [string, 
 const linesSchema = z.array(z.tuple([z.coerce.number(), z.coerce.number()]))
 const linesValidator = z
   .string()
-  .default('[[1, -1]]')
+  .nonoptional()
+  .prefault('[[1, -1]]')
   .transform((v, ctx) => {
     try {
       const array = JSON.parse(v)
@@ -83,14 +84,14 @@ const booleanValidator = z.union([z.boolean(), z.string(), z.undefined()]).trans
 const codeSampleExternalSchema = z.object({
   external: z.coerce.boolean().refine((v) => v === true),
   org: z.enum(ALLOW_LISTED_GITHUB_ORGS, {
-    errorMap: () => ({ message: 'Org must be one of: ' + ALLOW_LISTED_GITHUB_ORGS.join(', ') }),
+    error: 'Org must be one of: ' + ALLOW_LISTED_GITHUB_ORGS.join(', '),
   }),
   repo: z.string(),
   commit: z.string(),
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
-  hideElidedLines: z.coerce.boolean().default(false),
+  hideElidedLines: z.coerce.boolean().nonoptional().prefault(false),
   convertToJs: booleanValidator,
 })
 type ICodeSampleExternal = z.infer<typeof codeSampleExternalSchema> & AdditionalMeta
@@ -103,7 +104,7 @@ const codeSampleInternalSchema = z.object({
   path: z.string().transform((v) => (v.startsWith('/') ? v : `/${v}`)),
   lines: linesValidator,
   meta: z.string().optional(),
-  hideElidedLines: z.coerce.boolean().default(false),
+  hideElidedLines: z.coerce.boolean().nonoptional().prefault(false),
   convertToJs: booleanValidator,
 })
 type ICodeSampleInternal = z.infer<typeof codeSampleInternalSchema> & AdditionalMeta
@@ -183,7 +184,7 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
 
       if (!result.success) {
         throw new Error(
-          `Invalid $CodeSample directive: ${(result as SafeParseError<ICodeSampleExternal>).error.message}`
+          `Invalid $CodeSample directive: ${(result as ZodSafeParseError<ICodeSampleExternal>).error.message}`
         )
       }
 
@@ -225,7 +226,7 @@ async function fetchSourceCodeContent(tree: Root, deps: Dependencies) {
 
       if (!result.success) {
         throw new Error(
-          `Invalid $CodeSample directive: ${(result as SafeParseError<ICodeSampleInternal>).error.message}`
+          `Invalid $CodeSample directive: ${(result as ZodSafeParseError<ICodeSampleInternal>).error.message}`
         )
       }
 

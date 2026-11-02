@@ -85,8 +85,10 @@ export const BigQueryFormSchema = z.object({
   connectionPoolSize: requiredNumberInputSchema(
     z
       .number({
-        required_error: CONNECTION_POOL_SIZE_MIN_ERROR,
-        invalid_type_error: CONNECTION_POOL_SIZE_MIN_ERROR,
+        error: (issue) =>
+          issue.input === undefined
+            ? CONNECTION_POOL_SIZE_MIN_ERROR
+            : CONNECTION_POOL_SIZE_MIN_ERROR,
       })
       .int()
       .min(1, CONNECTION_POOL_SIZE_MIN_ERROR)

@@ -21,7 +21,7 @@ export const chartConfigSchema = z.object({
   x_column: z.string(),
   y_series: z.array(z.string()).max(MAX_CHART_Y_SERIES),
   cumulative: z.boolean(),
-  scale: z.enum(['linear', 'log']).default('linear'),
+  scale: z.enum(['linear', 'log']).nonoptional().prefault('linear'),
   show_labels: z.boolean(),
 })
 
@@ -61,6 +61,7 @@ export const databaseIdentifierSchema = z
   .string()
   .optional()
   .transform((value) => (value === '' ? undefined : value))
+  .optional()
 
 export const databaseSourceSchema = z.object({
   database_identifier: databaseIdentifierSchema,

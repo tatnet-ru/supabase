@@ -29,7 +29,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const parseResult = requestSchema.safeParse(req.body)
 
   if (!parseResult.success) {
-    const errorMessage = parseResult.error.errors.map((e) => e.message).join(', ')
+    const errorMessage = parseResult.error.issues.map((e) => e.message).join(', ')
     return res.status(400).json({ error: errorMessage })
   }
 

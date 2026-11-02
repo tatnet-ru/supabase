@@ -25,7 +25,7 @@ export const postgresColumnSchema = z.object({
   id: z.string().regex(/^(\d+)\.(\d+)$/),
   ordinal_position: z.number().int(),
   name: z.string(),
-  default_value: z.any(),
+  default_value: z.any().optional(),
   data_type: z.string(),
   format: z.string(),
   is_identity: z.boolean(),

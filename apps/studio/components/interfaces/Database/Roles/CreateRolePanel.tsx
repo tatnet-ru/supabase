@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -8,6 +7,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  formOutputResolver,
   Input,
   SidePanel,
   Switch,
@@ -25,13 +25,13 @@ interface CreateRolePanelProps {
 }
 
 const FormSchema = z.object({
-  name: z.string().trim().min(1, 'You must provide a name').default(''),
-  isSuperuser: z.boolean().default(false),
-  canLogin: z.boolean().default(false),
-  canCreateRole: z.boolean().default(false),
-  canCreateDb: z.boolean().default(false),
-  isReplicationRole: z.boolean().default(false),
-  canBypassRls: z.boolean().default(false),
+  name: z.string().trim().min(1, 'You must provide a name').nonoptional().prefault(''),
+  isSuperuser: z.boolean().nonoptional().prefault(false),
+  canLogin: z.boolean().nonoptional().prefault(false),
+  canCreateRole: z.boolean().nonoptional().prefault(false),
+  canCreateDb: z.boolean().nonoptional().prefault(false),
+  isReplicationRole: z.boolean().nonoptional().prefault(false),
+  canBypassRls: z.boolean().nonoptional().prefault(false),
 })
 
 const initialValues = {
@@ -50,7 +50,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: initialValues,
   })
 

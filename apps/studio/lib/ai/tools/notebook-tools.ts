@@ -47,7 +47,8 @@ export const getNotebookTools = (ctx: ToolContext = {}) => {
           .int()
           .positive()
           .max(100)
-          .default(20)
+          .nonoptional()
+          .prefault(20)
           .describe('Max number of notebooks to return.'),
         sort_by: z
           .enum(['name', 'inserted_at'])

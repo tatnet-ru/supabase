@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'motion/react'
@@ -6,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, cn, Form } from 'ui'
+import { Button, cn, Form, formOutputResolver } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
@@ -164,7 +163,7 @@ export function DiskManagementForm({
   }
 
   const form = useForm<DiskStorageSchemaType>({
-    resolver: zodResolver(
+    resolver: formOutputResolver(
       CreateDiskStorageSchema({
         defaultTotalSize: defaultValues.totalSize,
         cloudProvider: project?.cloud_provider as CloudProvider,

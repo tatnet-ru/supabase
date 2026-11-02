@@ -127,7 +127,8 @@ export async function debugSql(
     const [firstChoice] = completionResponse.choices
     const [firstTool] = firstChoice.message?.tool_calls ?? []
 
-    const sqlResponseString = firstTool?.function.arguments
+    const sqlResponseString =
+      firstTool?.type === 'function' ? firstTool.function.arguments : undefined
 
     if (!sqlResponseString) {
       throw new EmptyResponseError()
@@ -187,7 +188,8 @@ export async function titleSql(openai: OpenAI, sql: string) {
     const [firstChoice] = completionResponse.choices
     const [firstTool] = firstChoice.message?.tool_calls ?? []
 
-    const sqlResponseString = firstTool?.function.arguments
+    const sqlResponseString =
+      firstTool?.type === 'function' ? firstTool.function.arguments : undefined
 
     if (!sqlResponseString) {
       throw new EmptyResponseError()

@@ -51,7 +51,8 @@ const StatusPageIncidentsSchema = z.array(
           .optional(),
       })
       .optional()
-      .default({}),
+      .nonoptional()
+      .prefault({}),
   })
 )
 

@@ -15,7 +15,10 @@ export const formSchema = z.object({
         id: z.string(),
         value: z.string().min(1, 'Please provide a URL').url('Please provide a URL'),
       }),
-      { required_error: 'Please provide at least one callback URL' }
+      {
+        error: (issue) =>
+          issue.input === undefined ? 'Please provide at least one callback URL' : undefined,
+      }
     )
     .min(1, 'Please provide at least one callback URL'),
 })

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
@@ -12,6 +11,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   Switch,
 } from 'ui'
@@ -52,8 +52,8 @@ const smtpEnabledSchema = z.object({
   SMTP_PORT: preprocessEmptyNumberInput(
     z.coerce
       .number({
-        required_error: 'Port number is required',
-        invalid_type_error: 'Port number is required',
+        error: (issue) =>
+          issue.input === undefined ? 'Port number is required' : 'Port number is required',
       })
       .min(1, 'Must be a valid port number more than 0')
       .max(65535, 'Must be a valid port number no more than 65535')
@@ -111,7 +111,7 @@ export const SmtpForm = () => {
     isBeforeFreeTierTemplateBlockCutoff(selectedProject.inserted_at)
 
   const form = useForm<SmtpFormValues>({
-    resolver: zodResolver(
+    resolver: formOutputResolver(
       smtpSchema.superRefine((data, ctx) => {
         const isEnablingSmtp = data.ENABLE_SMTP && !isSmtpEnabled(authConfig)
 

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronDownIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -13,6 +12,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   Label,
   Separator,
@@ -56,9 +56,9 @@ const buildEndpointFormSchema = (mode: 'create' | 'edit') =>
         prefixMessage: 'Please prefix your URL with http:// or https://',
       }),
       description: z.string().trim().max(512, 'Description cannot exceed 512 characters'),
-      enabled: z.boolean().default(true),
-      subscribeAll: z.boolean().default(false),
-      eventTypes: z.array(z.string()).default([]),
+      enabled: z.boolean().nonoptional().prefault(true),
+      subscribeAll: z.boolean().nonoptional().prefault(false),
+      eventTypes: z.array(z.string()).nonoptional().prefault([]),
       customHeaders: z
         .array(
           z.object({
@@ -66,10 +66,11 @@ const buildEndpointFormSchema = (mode: 'create' | 'edit') =>
             value: z.string().trim(),
           })
         )
-        .default([]),
+        .nonoptional()
+        .prefault([]),
       // Only required on create — the API only accepts a new secret on create,
       // rotating it on an existing endpoint is a separate flow (regenerateSecret).
-      signingSecret: z.string().trim().default(''),
+      signingSecret: z.string().trim().nonoptional().prefault(''),
     })
     .superRefine((data, ctx) => {
       if (!data.subscribeAll && data.eventTypes.length === 0) {
@@ -188,7 +189,7 @@ export const PlatformWebhooksEndpointSheet = ({
   onSubmit,
 }: EndpointSheetProps) => {
   const form = useForm<EndpointFormValues>({
-    resolver: zodResolver(buildEndpointFormSchema(mode)),
+    resolver: formOutputResolver(buildEndpointFormSchema(mode)),
     defaultValues: {
       url: '',
       description: '',

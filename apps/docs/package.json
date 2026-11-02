@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@har-sdk/openapi-sampler": "^2.2.0",
-    "@hookform/resolvers": "^3.1.1",
+    "@hookform/resolvers": "^5.2.2",
     "@mdx-js/loader": "^3.0.0",
     "@mdx-js/react": "^3.0.0",
     "@next/bundle-analyzer": "15.3.1",
@@ -104,7 +104,7 @@
     "next-plugin-yaml": "^1.0.1",
     "next-themes": "catalog:",
     "nuqs": "^1.19.1",
-    "openai": "^4.75.1",
+    "openai": "^6.7.0",
     "openapi-fetch": "0.12.4",
     "radix-ui": "catalog:",
     "react": "catalog:",

@@ -15,7 +15,7 @@ import { useRunQuery } from '@/registry/default/platform/platform-kit-nextjs/hoo
 import { useListTables } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-tables'
 
 // Helper to generate a Zod schema from the table's column definitions
-function generateZodSchema(table: any): z.ZodObject<any, any, any> {
+function generateZodSchema(table: any): z.ZodObject<Record<string, z.ZodType>> {
   if (!table || !table.columns) {
     return z.object({})
   }

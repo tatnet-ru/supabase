@@ -68,16 +68,18 @@ export const Page = () => {
     }),
     email: z
       .string({
-        required_error: 'Please select an email to display.',
+        error: (issue) =>
+          issue.input === undefined ? 'Please select an email to display.' : undefined,
       })
       .email(),
-    consistent_settings: z.boolean().default(false).optional(),
-    switch_option: z.boolean().default(false).optional(),
+    consistent_settings: z.boolean().optional(),
+    switch_option: z.boolean().optional(),
     items: z.array(z.string()).refine((value) => value.some((item) => item), {
       message: 'You have to select at least one item.',
     }),
     type: z.enum(['all', 'mentions', 'none'], {
-      required_error: 'You need to select a notification type.',
+      error: (issue) =>
+        issue.input === undefined ? 'You need to select a notification type.' : undefined,
     }),
   })
 

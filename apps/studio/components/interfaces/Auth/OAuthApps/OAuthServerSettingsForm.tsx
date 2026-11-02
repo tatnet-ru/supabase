@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
@@ -13,6 +12,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   Switch,
 } from 'ui'
@@ -41,10 +41,10 @@ const configUrlSchema = z.object({
 
 const schema = z
   .object({
-    OAUTH_SERVER_ENABLED: z.boolean().default(false),
-    OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: z.boolean().default(false),
-    OAUTH_SERVER_AUTHORIZATION_PATH: z.string().default(''),
-    availableScopes: z.array(z.string()).default(['openid', 'email', 'profile']),
+    OAUTH_SERVER_ENABLED: z.boolean().nonoptional().prefault(false),
+    OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: z.boolean().nonoptional().prefault(false),
+    OAUTH_SERVER_AUTHORIZATION_PATH: z.string().nonoptional().prefault(''),
+    availableScopes: z.array(z.string()).nonoptional().prefault(['openid', 'email', 'profile']),
     config_urls: z.array(configUrlSchema).optional(),
   })
   .superRefine((data, ctx) => {
@@ -57,20 +57,7 @@ const schema = z
     }
   })
 
-interface ConfigUrl {
-  id: string
-  name: string
-  value: string
-  description?: string
-}
-
-interface OAuthServerSettings {
-  OAUTH_SERVER_ENABLED: boolean
-  OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: boolean
-  OAUTH_SERVER_AUTHORIZATION_PATH?: string
-  availableScopes: string[]
-  config_urls?: ConfigUrl[]
-}
+type OAuthServerSettings = z.output<typeof schema>
 
 export const OAuthServerSettingsForm = () => {
   const { ref: projectRef } = useParams()
@@ -118,7 +105,7 @@ export const OAuthServerSettingsForm = () => {
   )
 
   const form = useForm<OAuthServerSettings>({
-    resolver: zodResolver(schema),
+    resolver: formOutputResolver(schema),
     defaultValues: {
       OAUTH_SERVER_ENABLED: true,
       OAUTH_SERVER_ALLOW_DYNAMIC_REGISTRATION: false,

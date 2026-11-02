@@ -12,7 +12,7 @@ export const imageSchema = z.object({
 export const ctaSchema = z.object({
   label: z.string().min(1),
   href: z.string().min(1),
-  variant: z.enum(['primary', 'secondary']).optional().default('primary'),
+  variant: z.enum(['primary', 'secondary']).optional().nonoptional().prefault('primary'),
 })
 
 // ----- Section schemas -----
@@ -42,7 +42,7 @@ export const contentBlockSchema = z.object({
 export const contentBlocksSectionSchema = z.object({
   heading: z.string().optional(),
   blocks: z.array(contentBlockSchema).min(1),
-  columns: z.enum(['2', '3']).optional().default('3'),
+  columns: z.enum(['2', '3']).optional().nonoptional().prefault('3'),
 })
 
 export const socialProofSectionSchema = z.object({
@@ -139,8 +139,8 @@ const formFieldBase = z.object({
   /** Helper text rendered beneath the input. */
   description: z.string().optional(),
   placeholder: z.string().optional(),
-  required: z.boolean().optional().default(false),
-  half: z.boolean().optional().default(false),
+  required: z.boolean().optional().nonoptional().prefault(false),
+  half: z.boolean().optional().nonoptional().prefault(false),
   showWhen: showWhenSchema.optional(),
 })
 
@@ -158,7 +158,7 @@ export const emailFieldSchema = formFieldBase.extend({
 
 export const textareaFieldSchema = formFieldBase.extend({
   type: z.literal('textarea'),
-  rows: z.number().optional().default(4),
+  rows: z.number().optional().nonoptional().prefault(4),
 })
 
 export const selectFieldSchema = formFieldBase.extend({
@@ -174,7 +174,7 @@ export const checkboxFieldSchema = formFieldBase.extend({
    * must be selected.
    */
   group: z.string().optional(),
-  groupRequired: z.boolean().optional().default(false),
+  groupRequired: z.boolean().optional().nonoptional().prefault(false),
 })
 
 /**
@@ -349,7 +349,8 @@ export const featureGridSectionSchema = z.object({
   columns: z
     .union([z.literal(1), z.literal(2), z.literal(3)])
     .optional()
-    .default(3),
+    .nonoptional()
+    .prefault(3),
   items: z.array(featureGridItemSchema).min(1).max(6),
 })
 
@@ -388,7 +389,7 @@ export const faqSectionSchema = z.object({
 export const codeFileSchema = z.object({
   filename: z.string().min(1),
   code: z.string().min(1),
-  language: z.string().optional().default('sql'),
+  language: z.string().optional().nonoptional().prefault('sql'),
 })
 
 export const codeBlockSectionSchema = z.object({
@@ -398,7 +399,7 @@ export const codeBlockSectionSchema = z.object({
   description: z.string().optional(),
   /** Single-file mode */
   code: z.string().optional(),
-  language: z.string().optional().default('sql'),
+  language: z.string().optional().nonoptional().prefault('sql'),
   filename: z.string().optional(),
   /** Multi-file mode — takes precedence over code/filename/language when set */
   files: z.array(codeFileSchema).optional(),
@@ -460,7 +461,7 @@ export const metadataSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
   ogImage: z.string().optional(),
-  noIndex: z.boolean().optional().default(true),
+  noIndex: z.boolean().optional().nonoptional().prefault(true),
 })
 
 // ----- Page schemas -----

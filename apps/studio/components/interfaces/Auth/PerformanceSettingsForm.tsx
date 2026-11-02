@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -12,6 +11,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -98,14 +98,14 @@ export const PerformanceSettingsForm = () => {
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   const requestDurationForm = useForm({
-    resolver: zodResolver(
+    resolver: formOutputResolver(
       z.object({ API_MAX_REQUEST_DURATION: FormSchema.shape.API_MAX_REQUEST_DURATION })
     ),
     defaultValues: { API_MAX_REQUEST_DURATION: 10 },
   })
 
   const databaseForm = useForm<z.infer<typeof DatabaseFormSchema>>({
-    resolver: zodResolver(DatabaseFormSchema),
+    resolver: formOutputResolver(DatabaseFormSchema),
     defaultValues: {
       DB_MAX_POOL_SIZE: 10,
       DB_MAX_POOL_SIZE_UNIT: 'connections',

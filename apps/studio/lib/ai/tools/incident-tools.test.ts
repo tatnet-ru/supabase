@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { z } from 'zod'
 
 import { getIncidentTools } from './incident-tools'
 
@@ -45,7 +46,7 @@ describe('ai/tools/incident-tools', () => {
 
       // The schema is a Zod object that accepts empty object
       expect(schema).toBeDefined()
-      expect((schema as any)._def.typeName).toBe('ZodObject')
+      expect(schema).toBeInstanceOf(z.ZodObject)
     })
 
     describe('execute function', () => {

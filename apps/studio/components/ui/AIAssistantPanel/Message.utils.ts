@@ -1,5 +1,5 @@
 import { untrustedSql } from '@supabase/pg-meta'
-import { z, type SafeParseReturnType } from 'zod'
+import { z } from 'zod'
 
 // Splits markdown into alternating [plain, code, plain, code, ...] segments.
 // Odd-indexed segments are already inside code spans/fences and should be left alone.
@@ -93,7 +93,7 @@ const executeSqlChartResultSchema = z
 
 export function parseExecuteSqlChartResult(
   input: unknown
-): SafeParseReturnType<unknown, z.infer<typeof executeSqlChartResultSchema>> {
+): z.ZodSafeParseResult<z.infer<typeof executeSqlChartResultSchema>> {
   return executeSqlChartResultSchema.safeParse(input)
 }
 

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
@@ -14,6 +13,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -82,7 +82,7 @@ export const RateLimits = () => {
   })
 
   const ipForwardingForm = useForm<z.infer<typeof IPForwardingFormSchema>>({
-    resolver: zodResolver(IPForwardingFormSchema),
+    resolver: formOutputResolver(IPForwardingFormSchema),
     defaultValues: {
       SECURITY_SB_FORWARDED_FOR_ENABLED: false,
     },
@@ -139,7 +139,7 @@ export const RateLimits = () => {
   })
 
   const rateLimitForm = useForm<z.infer<typeof RateLimitFormSchema>>({
-    resolver: zodResolver(RateLimitFormSchema),
+    resolver: formOutputResolver(RateLimitFormSchema),
     defaultValues: {
       RATE_LIMIT_TOKEN_REFRESH: 0,
       RATE_LIMIT_VERIFY: 0,

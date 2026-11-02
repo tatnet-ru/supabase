@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -15,6 +14,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   Form,
+  formOutputResolver,
   Label,
   ScrollArea,
 } from 'ui'
@@ -45,7 +45,8 @@ const createRedirectUrlsSchema = (normalizedAllowList: string[]) => {
           value: z.string().trim().min(1, 'Please provide a value').transform(normalizeRedirectUrl),
         })
         .array()
-        .default([]),
+        .nonoptional()
+        .prefault([]),
     })
     .superRefine((data, ctx) => {
       const seenUrls = new Set<string>()
@@ -88,7 +89,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
 
   const initialValues = { urls: [{ value: '' }] }
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: formOutputResolver(formSchema),
     defaultValues: initialValues,
   })
   const urls = useWatch({ control: form.control, name: 'urls' })
