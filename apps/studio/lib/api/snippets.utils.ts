@@ -15,12 +15,18 @@ type DeepPartial<T> = T extends object
 
 export const SnippetSchema = z.object({
   id: z.string().uuid(),
-  inserted_at: z.string().default(() => new Date().toISOString()),
-  updated_at: z.string().default(() => new Date().toISOString()),
+  inserted_at: z
+    .string()
+    .nonoptional()
+    .prefault(() => new Date().toISOString()),
+  updated_at: z
+    .string()
+    .nonoptional()
+    .prefault(() => new Date().toISOString()),
   type: z.literal('sql'),
   name: z.string(),
   description: z.string().optional(),
-  favorite: z.boolean().default(false),
+  favorite: z.boolean().nonoptional().prefault(false),
   content: z.object({
     sql: z.string(),
     content_id: z.string(),
@@ -32,29 +38,31 @@ export const SnippetSchema = z.object({
     z.literal('org'),
     z.literal('public'),
   ]),
-  project_id: z.number().default(1),
-  folder_id: z.string().nullable().default(null),
-  owner_id: z.number().default(1),
+  project_id: z.number().nonoptional().prefault(1),
+  folder_id: z.string().nullable().nonoptional().prefault(null),
+  owner_id: z.number().nonoptional().prefault(1),
   owner: z
     .object({
       id: z.number(),
       username: z.string(),
     })
-    .default({ id: 1, username: 'johndoe' }),
+    .nonoptional()
+    .prefault({ id: 1, username: 'johndoe' }),
   updated_by: z
     .object({
       id: z.number(),
       username: z.string(),
     })
-    .default({ id: 1, username: 'johndoe' }),
+    .nonoptional()
+    .prefault({ id: 1, username: 'johndoe' }),
 })
 
 export const FolderSchema = z.object({
   id: z.string(),
   name: z.string(),
-  owner_id: z.number().default(1),
+  owner_id: z.number().nonoptional().prefault(1),
   parent_id: z.string().nullable(),
-  project_id: z.number().default(1),
+  project_id: z.number().nonoptional().prefault(1),
 })
 
 export type Snippet = z.infer<typeof SnippetSchema>

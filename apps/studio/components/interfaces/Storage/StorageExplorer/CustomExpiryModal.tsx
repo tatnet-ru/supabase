@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import {
@@ -13,6 +12,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   Select,
   SelectContent,
@@ -38,7 +38,7 @@ const formSchema = z.object({
   expiresIn: z.preprocess(
     (val) => (val ? val : undefined),
     z.coerce
-      .number({ required_error: 'Required', invalid_type_error: 'Required' })
+      .number({ error: (issue) => (issue.input === undefined ? 'Required' : 'Required') })
       .positive('Expiry duration must be greater than 0')
   ),
   units: z.enum(['days', 'weeks', 'months', 'years']),
@@ -57,7 +57,7 @@ export const CustomExpiryModal = () => {
   const onClose = () => setSelectedFileCustomExpiry(undefined)
 
   const form = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
+    resolver: formOutputResolver(formSchema),
     defaultValues: { expiresIn: 0, units: 'days' },
   })
 

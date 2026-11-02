@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -23,6 +22,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -127,7 +127,7 @@ const DiskSizeConfigurationModal = ({
   }
 
   const form = useForm<z.infer<typeof diskSizeValidationSchema>>({
-    resolver: zodResolver(diskSizeValidationSchema),
+    resolver: formOutputResolver(diskSizeValidationSchema),
     defaultValues: INITIAL_VALUES,
   })
   const { reset, formState } = form

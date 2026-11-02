@@ -30,14 +30,14 @@ function ProviderSettingsView({
   onSuccess,
 }: {
   projectRef: string
-  schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>>
+  schema: z.ZodObject
   title: string
   initialValues: any
   onSuccess: () => void
 }) {
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useUpdateAuthConfig()
 
-  const actualSchema = 'shape' in schema ? schema : (schema._def.schema as z.ZodObject<any>)
+  const actualSchema = schema
 
   const handleUpdateAuthConfig = (formData: z.infer<typeof actualSchema>) => {
     const payload = Object.fromEntries(
@@ -122,7 +122,7 @@ export function AuthManager({ projectRef }: { projectRef: string }) {
     name: string
     icon: React.ReactNode
     description: string
-    schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>>
+    schema: z.ZodObject
   }[] = [
     {
       icon: <Mail className="h-4 w-4 text-muted-foreground" />,
@@ -145,7 +145,7 @@ export function AuthManager({ projectRef }: { projectRef: string }) {
   ]
 
   const handleProviderClick = useCallback(
-    (provider: { name: string; schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>> }) => {
+    (provider: { name: string; schema: z.ZodObject }) => {
       push({
         title: `${provider.name} Provider Settings`,
         component: (

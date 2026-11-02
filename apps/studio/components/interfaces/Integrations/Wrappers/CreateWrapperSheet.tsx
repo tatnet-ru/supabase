@@ -1,11 +1,12 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
+import type { FieldValues } from 'react-hook-form'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
   cn,
+  dynamicFormResolver,
   Form,
   FormControl,
   FormField,
@@ -105,9 +106,9 @@ export const CreateWrapperSheet = ({
 
   const formSchema = getWrapperCreationFormSchema(wrapperMeta)
   type FormSchema = z.infer<typeof formSchema>
-  const form = useForm<FormSchema>({
+  const form = useForm<FieldValues, unknown, FormSchema>({
     defaultValues: initialValues,
-    resolver: zodResolver(formSchema),
+    resolver: dynamicFormResolver(formSchema),
   })
 
   const { getValues, setError } = form
@@ -149,7 +150,8 @@ export const CreateWrapperSheet = ({
   }
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
-    const { mode, tables = [], ...wrapperValues } = values
+    const { mode, tables: modeTables, ...wrapperValues } = values
+    const tables = mode === 'tables' ? modeTables : []
     if (mode === 'tables' && tables.length === 0) {
       setError('tables', {
         type: 'validate',
@@ -187,7 +189,7 @@ export const CreateWrapperSheet = ({
         await createSchema({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          name: wrapperValues.target_schema,
+          name: values.mode === 'schema' ? values.target_schema : '',
         })
         toast.loading(`Creating ${wrapperMeta.label} wrapper…`, { id: toastId })
       }
@@ -198,12 +200,12 @@ export const CreateWrapperSheet = ({
         wrapperMeta,
         formState: {
           ...wrapperValues,
-          supabase_target_schema: mode === 'schema' ? wrapperValues.target_schema : undefined,
+          ...(values.mode === 'schema' ? { supabase_target_schema: values.target_schema } : {}),
         },
         mode: mode === 'schema' ? (wrapperMeta.sourceSchemaOption ? 'schema' : 'skip') : 'tables',
         tables,
-        sourceSchema: wrapperValues.source_schema,
-        targetSchema: wrapperValues.target_schema,
+        sourceSchema: values.mode === 'schema' ? values.source_schema : '',
+        targetSchema: values.mode === 'schema' ? values.target_schema : '',
       })
 
       const { tables: formTables } = getValues()

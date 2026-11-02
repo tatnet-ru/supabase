@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { PlusIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -11,6 +10,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  formOutputResolver,
   Input,
   InputGroup,
   InputGroupAddon,
@@ -62,7 +62,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
     columns: [{ name: '', type: 'string' }],
   }
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues,
     mode: 'onChange',
   })

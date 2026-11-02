@@ -1,4 +1,4 @@
-import { zodResolver } from '@hookform/resolvers/zod'
+import { formOutputResolver } from 'ui'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import {
@@ -63,7 +63,7 @@ function HoursOrNeverText({ value }: { value: number }) {
 
 export default function PageLayoutSettings() {
   const refreshTokenForm = useForm<z.infer<typeof RefreshTokenSchema>>({
-    resolver: zodResolver(RefreshTokenSchema),
+    resolver: formOutputResolver(RefreshTokenSchema),
     defaultValues: {
       REFRESH_TOKEN_ROTATION_ENABLED: false,
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: 10,
@@ -71,7 +71,7 @@ export default function PageLayoutSettings() {
   })
 
   const userSessionsForm = useForm<z.infer<typeof UserSessionsSchema>>({
-    resolver: zodResolver(UserSessionsSchema),
+    resolver: formOutputResolver(UserSessionsSchema),
     defaultValues: {
       SESSIONS_TIMEBOX: 0,
       SESSIONS_INACTIVITY_TIMEOUT: 0,

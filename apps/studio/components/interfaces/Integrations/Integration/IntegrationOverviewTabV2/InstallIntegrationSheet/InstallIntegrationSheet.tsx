@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -6,6 +5,7 @@ import {
   Button,
   DialogSectionSeparator,
   Form,
+  formOutputResolver,
   Sheet,
   SheetClose,
   SheetContent,
@@ -70,14 +70,11 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   const involvesExtensions = requiredExtensionNames.length > 0
 
   const schema = useMemo(() => {
-    let baseSchema = z.object({})
-    Object.entries(inputs).forEach((entry) => {
-      const [key, input] = entry
-      baseSchema = baseSchema.extend({
-        [key]: z.string().min(1, `Please provide a value for ${input.label}`),
-      })
+    const shape: Record<string, z.ZodString> = {}
+    Object.entries(inputs).forEach(([key, input]) => {
+      shape[key] = z.string().min(1, `Please provide a value for ${input.label}`)
     })
-    return baseSchema
+    return z.object(shape)
   }, [inputs])
 
   const defaultValues = useMemo(() => {
@@ -92,7 +89,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   const form = useForm<Record<string, string>>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
-    resolver: zodResolver(schema),
+    resolver: formOutputResolver(schema),
     defaultValues,
   })
 

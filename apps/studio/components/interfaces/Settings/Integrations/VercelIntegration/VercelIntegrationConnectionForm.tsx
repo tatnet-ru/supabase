@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -14,6 +13,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  formOutputResolver,
   Input,
   Switch,
 } from 'ui'
@@ -52,14 +52,23 @@ const VercelIntegrationConnectionForm = ({
     org?.managed_by === 'vercel-marketplace' ? [] : (connection.env_sync_targets ?? [])
 
   const FormSchema = z.object({
-    environmentVariablesProduction: z.boolean().default(envSyncTargets.includes('production')),
-    environmentVariablesPreview: z.boolean().default(envSyncTargets.includes('preview')),
-    environmentVariablesDevelopment: z.boolean().default(envSyncTargets.includes('development')),
+    environmentVariablesProduction: z
+      .boolean()
+      .nonoptional()
+      .prefault(envSyncTargets.includes('production')),
+    environmentVariablesPreview: z
+      .boolean()
+      .nonoptional()
+      .prefault(envSyncTargets.includes('preview')),
+    environmentVariablesDevelopment: z
+      .boolean()
+      .nonoptional()
+      .prefault(envSyncTargets.includes('development')),
     publicEnvVarPrefix: z.string().optional(),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: {
       environmentVariablesProduction: envSyncTargets.includes('production'),
       environmentVariablesPreview: envSyncTargets.includes('preview'),

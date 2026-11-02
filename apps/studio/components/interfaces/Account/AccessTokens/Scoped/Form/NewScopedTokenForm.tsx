@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useReducedMotion } from 'common'
 import { ChevronRightIcon, XIcon } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
@@ -7,6 +6,7 @@ import { toast } from 'sonner'
 import {
   Button,
   Form,
+  formOutputResolver,
   InfoIcon,
   Popover,
   PopoverAnchor,
@@ -60,7 +60,7 @@ export const NewScopedTokenForm = forwardRef<
   }
 >(({ isPending, onCreateToken, onCancel }, ref) => {
   const form = useForm<TokenFormValues>({
-    resolver: zodResolver(TokenFormSchema),
+    resolver: formOutputResolver(TokenFormSchema),
     defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   })

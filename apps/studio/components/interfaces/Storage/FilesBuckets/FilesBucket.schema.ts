@@ -12,10 +12,10 @@ const versioningNumberField = z.union([z.literal(''), z.coerce.number().int()])
 export const S3_MAX_NONCURRENT_VERSIONS = 100
 
 export const bucketVersioningFormFields = {
-  enable_versioning: z.boolean().default(false),
-  version_expiry_days: versioningNumberField.default(''),
-  max_noncurrent_versions: versioningNumberField.default(''),
-  expiration_mode: z.enum(['and', 'or']).default('and'),
+  enable_versioning: z.boolean().nonoptional().prefault(false),
+  version_expiry_days: versioningNumberField.nonoptional().prefault(''),
+  max_noncurrent_versions: versioningNumberField.nonoptional().prefault(''),
+  expiration_mode: z.enum(['and', 'or']).nonoptional().prefault('and'),
 }
 
 export interface BucketVersioningFormValues {
@@ -79,13 +79,13 @@ const BucketFormObjectSchema = z.object({
       (value) => value !== 'public',
       '"public" is a reserved name. Please choose another name'
     ),
-  public: z.boolean().default(false),
-  has_file_size_limit: z.boolean().default(false),
+  public: z.boolean().nonoptional().prefault(false),
+  has_file_size_limit: z.boolean().nonoptional().prefault(false),
   formatted_size_limit: z.coerce
     .number()
     .min(0, 'File size upload limit has to be at least 0')
     .optional(),
-  allowed_mime_types: z.string().trim().default(''),
+  allowed_mime_types: z.string().trim().nonoptional().prefault(''),
   ...bucketVersioningFormFields,
 })
 

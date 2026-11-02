@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { z, type SafeParseReturnType } from 'zod'
+import { z } from 'zod'
 
 import { DEFAULT_ASSISTANT_LOGS_QUERY_TITLE } from './AssistantQueryCell.utils'
 import { type QueryResult } from '@/components/interfaces/Explorer/types'
@@ -24,7 +24,7 @@ const queryLogsInputSchema = z.object({
 
 export function parseQueryLogsInput(
   input: unknown
-): SafeParseReturnType<unknown, z.infer<typeof queryLogsInputSchema>> {
+): z.ZodSafeParseResult<z.infer<typeof queryLogsInputSchema>> {
   return queryLogsInputSchema.safeParse(input)
 }
 

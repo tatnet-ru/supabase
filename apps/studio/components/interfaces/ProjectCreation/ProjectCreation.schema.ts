@@ -5,7 +5,7 @@ import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
 export const FormSchema = z
   .object({
     organization: z.string({
-      required_error: 'Please select an organization',
+      error: (issue) => (issue.input === undefined ? 'Please select an organization' : undefined),
     }),
     projectName: z
       .string()
@@ -15,7 +15,8 @@ export const FormSchema = z
       .max(64, 'Project name must be no longer than 64 characters.'), // Maximum length check
     highAvailability: z.boolean(),
     postgresVersion: z.string({
-      required_error: 'Please enter a Postgres version.',
+      error: (issue) =>
+        issue.input === undefined ? 'Please enter a Postgres version.' : undefined,
     }),
     instanceType: z.string().optional(),
     kubernetesClusterId: z
@@ -25,25 +26,31 @@ export const FormSchema = z
       .optional(),
     kubernetesClusterForce: z.boolean().optional(),
     dbRegion: z
-      .string({ required_error: 'Please select a region.' })
+      .string({
+        error: (issue) => (issue.input === undefined ? 'Please select a region.' : undefined),
+      })
       .trim()
       .min(1, 'Please select a region.'),
     cloudProvider: z.string({
-      required_error: 'Please select a cloud provider.',
+      error: (issue) => (issue.input === undefined ? 'Please select a cloud provider.' : undefined),
     }),
 
     dbPass: z
-      .string({ required_error: 'Please enter a database password.' })
+      .string({
+        error: (issue) =>
+          issue.input === undefined ? 'Please enter a database password.' : undefined,
+      })
       .min(1, 'Password is required.'),
     dbPassStrength: z
       .union([z.literal(0), z.literal(1), z.literal(2), z.literal(3), z.literal(4)])
-      .default(0),
-    dbPassStrengthMessage: z.string().default(''),
-    dbPassStrengthWarning: z.string().default(''),
+      .nonoptional()
+      .prefault(0),
+    dbPassStrengthMessage: z.string().nonoptional().prefault(''),
+    dbPassStrengthWarning: z.string().nonoptional().prefault(''),
     instanceSize: z.string().optional(),
-    githubRepositoryId: z.string().optional().default(''),
+    githubRepositoryId: z.string().optional().nonoptional().prefault(''),
     githubInstallationId: z.number().optional(),
-    githubRepositoryName: z.string().optional().default(''),
+    githubRepositoryName: z.string().optional().nonoptional().prefault(''),
     dataApi: z.boolean(),
     dataApiDefaultPrivileges: z.boolean(),
     enableRlsEventTrigger: z.boolean(),

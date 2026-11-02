@@ -1,5 +1,4 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
@@ -26,6 +25,7 @@ import {
   DialogTrigger,
   Form,
   FormField,
+  formOutputResolver,
   Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -85,7 +85,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   } = useOrganizationCreditTopUpMutation({})
 
   const form = useForm<CreditTopUpForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: {
       amount: 300,
       paymentMethod: '',

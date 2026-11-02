@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
@@ -13,6 +12,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -94,13 +94,15 @@ export const SessionsAuthSettingsForm = () => {
 
   const refreshTokenResolver = useMemo(
     () =>
-      zodResolver(createRefreshTokenSchema({ savedReuseInterval: savedRefreshTokenReuseInterval })),
+      formOutputResolver(
+        createRefreshTokenSchema({ savedReuseInterval: savedRefreshTokenReuseInterval })
+      ),
     [savedRefreshTokenReuseInterval]
   )
 
   const userSessionsResolver = useMemo(
     () =>
-      zodResolver(
+      formOutputResolver(
         createUserSessionsSchema({
           savedTimebox: savedSessionsTimebox,
           savedInactivityTimeout: savedSessionsInactivityTimeout,
@@ -110,7 +112,7 @@ export const SessionsAuthSettingsForm = () => {
   )
 
   const accessTokenForm = useForm<AccessTokenFormValues>({
-    resolver: zodResolver(AccessTokenSchema),
+    resolver: formOutputResolver(AccessTokenSchema),
     defaultValues: {
       JWT_EXP: 3600,
     },

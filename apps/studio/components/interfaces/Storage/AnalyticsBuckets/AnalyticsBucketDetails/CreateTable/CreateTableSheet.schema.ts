@@ -45,7 +45,8 @@ export const createFormSchema = () =>
           length: z.number().int().optional(),
         })
         .array()
-        .default([]),
+        .nonoptional()
+        .prefault([]),
     })
     .superRefine((data, ctx) => {
       if (data.namespace === NEW_NAMESPACE_MARKER) {

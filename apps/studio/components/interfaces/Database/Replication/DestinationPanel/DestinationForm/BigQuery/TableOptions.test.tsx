@@ -1,9 +1,8 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { useForm } from 'react-hook-form'
-import { Form } from 'ui'
+import { Form, formOutputResolver } from 'ui'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -103,7 +102,7 @@ const TableOptionsHarness = ({
 }) => {
   const form = useForm<DestinationPanelSchemaType>({
     mode: 'onChange',
-    resolver: zodResolver(DestinationPanelFormSchema),
+    resolver: formOutputResolver(DestinationPanelFormSchema),
     defaultValues: {
       name: 'Warehouse',
       publicationName,

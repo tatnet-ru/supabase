@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -17,6 +16,7 @@ import {
   FormField,
   FormInputGroupInput,
   FormItem,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -191,7 +191,7 @@ export const PostgrestConfig = () => {
   }, [config, configDbSchemas, defaultPrivilegesGranted])
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: formOutputResolver(formSchema),
     mode: 'onChange',
     defaultValues,
   })

@@ -2,8 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
-import type { z, ZodTypeAny } from 'zod'
+import { useForm, type DefaultValues, type FieldPath } from 'react-hook-form'
+import { z } from 'zod'
 
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -25,55 +25,65 @@ import {
 } from '@/registry/default/components/ui/select'
 import { Switch } from '@/registry/default/components/ui/switch'
 
-interface DynamicFormProps<T extends z.ZodRawShape = z.ZodRawShape> {
+interface DynamicFormProps<T extends Record<string, z.ZodType> = Record<string, z.ZodType>> {
   schema: z.ZodObject<T>
   onSubmit: (data: z.infer<z.ZodObject<T>>) => void
   isLoading?: boolean
-  initialValues?: Partial<z.infer<z.ZodObject<T>>>
+  initialValues?: Record<string, unknown>
   labels?: Record<string, string | { label: string; options?: Record<string, string> }>
   columnInfo?: Record<string, { data_type: string; is_nullable: boolean }>
 }
 
-const getZodDef = (schema: ZodTypeAny): Record<string, any> =>
-  (schema as any)._def || (schema as any).def
+const getZodDef = (schema: z.core.$ZodType) => (schema as z.core.$ZodTypes)._zod.def
 
-const unwrapZodType = (fieldSchema: ZodTypeAny): ZodTypeAny => {
-  if (
-    !fieldSchema ||
-    typeof getZodDef(fieldSchema) !== 'object' ||
-    getZodDef(fieldSchema) === null
-  ) {
-    throw new Error(
-      `unwrapZodType received an invalid Zod schema object. Check the console for the problematic schema/key.`
-    )
+const unwrapZodType = (fieldSchema: z.core.$ZodType): z.core.$ZodType => {
+  const def = getZodDef(fieldSchema)
+  switch (def.type) {
+    case 'optional':
+    case 'nonoptional':
+    case 'default':
+    case 'prefault':
+    case 'nullable':
+    case 'catch':
+    case 'readonly':
+      return unwrapZodType(def.innerType)
+    case 'pipe':
+      return unwrapZodType(getZodDef(def.in).type === 'transform' ? def.out : def.in)
+    default:
+      return fieldSchema
   }
-  let currentSchema = fieldSchema
-
-  // Support both old (typeName) and new (type) Zod formats
-  const getTypeName = (def: Record<string, any>) => def.typeName || def.type
-
-  while (
-    getTypeName(getZodDef(currentSchema)) === 'ZodOptional' ||
-    getTypeName(getZodDef(currentSchema)) === 'optional' ||
-    getTypeName(getZodDef(currentSchema)) === 'ZodDefault' ||
-    getTypeName(getZodDef(currentSchema)) === 'default' ||
-    getTypeName(getZodDef(currentSchema)) === 'ZodNullable' ||
-    getTypeName(getZodDef(currentSchema)) === 'nullable' ||
-    getTypeName(getZodDef(currentSchema)) === 'ZodEffects' ||
-    getTypeName(getZodDef(currentSchema)) === 'effects'
-  ) {
-    const typeName = getTypeName(getZodDef(currentSchema))
-    if (typeName === 'ZodEffects' || typeName === 'effects') {
-      // For ZodEffects, get the schema inside the effect
-      currentSchema = getZodDef(currentSchema).schema
-    } else {
-      currentSchema = getZodDef(currentSchema).innerType
-    }
-  }
-  return currentSchema
 }
 
-export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
+// Keep defaults as raw form input: transformations run once, on submission.
+const getDefault = (schema: z.core.$ZodType): { value: unknown } | undefined => {
+  const def = getZodDef(schema)
+  switch (def.type) {
+    case 'default':
+    case 'prefault':
+      return { value: def.defaultValue }
+    case 'optional':
+    case 'nonoptional':
+    case 'nullable':
+    case 'catch':
+    case 'readonly':
+      return getDefault(def.innerType)
+    case 'pipe':
+      return getDefault(getZodDef(def.in).type === 'transform' ? def.out : def.in)
+    default:
+      return undefined
+  }
+}
+
+const zDescription = (schema: z.core.$ZodType) => z.core.globalRegistry.get(schema)?.description
+
+const enumValues = (schema: z.core.$ZodType) => {
+  const def = getZodDef(schema)
+  return def.type === 'enum'
+    ? Object.values(def.entries).filter((value) => typeof value === 'string')
+    : []
+}
+
+export function DynamicForm<T extends Record<string, z.ZodType> = Record<string, z.ZodType>>({
   schema,
   onSubmit,
   isLoading = false,
@@ -92,39 +102,29 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
         )
       }
 
-      // Support both old (typeName) and new (type) Zod formats
-      const getTypeName = (def: Record<string, any>) => def.typeName || def.type
-
-      if (
-        getTypeName(getZodDef(originalFieldSchema)) === 'ZodDefault' ||
-        getTypeName(getZodDef(originalFieldSchema)) === 'default'
-      ) {
-        acc[key] = getZodDef(originalFieldSchema).defaultValue()
+      const fieldDefault = getDefault(originalFieldSchema)
+      if (fieldDefault) {
+        acc[key] = fieldDefault.value
         return acc
       }
 
       const baseType = unwrapZodType(originalFieldSchema)
 
-      switch (getTypeName(getZodDef(baseType))) {
-        case 'ZodString':
+      switch (getZodDef(baseType).type) {
         case 'string':
           acc[key] = ''
           break
-        case 'ZodBoolean':
         case 'boolean':
           acc[key] = false // Default optional booleans to false
           break
-        case 'ZodEnum':
         case 'enum':
           // For enums, use the first enum value as default
-          const enumValues = getZodDef(baseType).values || []
-          acc[key] = enumValues.length > 0 ? enumValues[0] : ''
+          const options = enumValues(baseType)
+          acc[key] = options[0] ?? ''
           break
-        case 'ZodNumber':
         case 'number':
           acc[key] = 0 // Default optional numbers to 0
           break
-        case 'ZodArray':
         case 'array':
           acc[key] = [] // Default arrays to empty array
           break
@@ -134,12 +134,12 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
       }
       return acc
     },
-    {} as Record<string, any>
+    {} as Record<string, unknown>
   )
 
-  const form = useForm<z.infer<typeof schema>>({
+  const form = useForm<z.input<typeof schema>, unknown, z.output<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues as any,
+    defaultValues: defaultValues as DefaultValues<z.input<typeof schema>>,
   })
 
   useEffect(() => {
@@ -155,24 +155,21 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
           const value = initialValues.hasOwnProperty(key) ? initialValues[key] : undefined
           const baseFieldType = unwrapZodType(fieldDefFromSchema)
 
-          // Support both old (typeName) and new (type) Zod formats
-          const getTypeName = (def: Record<string, any>) => def.typeName || def.type
-
-          const fieldTypeName = getTypeName(getZodDef(baseFieldType))
-          if (fieldTypeName === 'ZodBoolean' || fieldTypeName === 'boolean') {
+          const fieldTypeName = getZodDef(baseFieldType).type
+          if (fieldTypeName === 'boolean') {
             acc[key] = !!value
-          } else if (fieldTypeName === 'ZodString' || fieldTypeName === 'string') {
+          } else if (fieldTypeName === 'string') {
             acc[key] = value === null || value === undefined ? '' : String(value)
-          } else if (fieldTypeName === 'ZodEnum' || fieldTypeName === 'enum') {
-            const enumValues = getZodDef(baseFieldType).values || []
+          } else if (fieldTypeName === 'enum') {
+            const options = enumValues(baseFieldType)
             acc[key] =
-              value === null || value === undefined || !enumValues.includes(value)
-                ? enumValues[0] || ''
+              value === null || value === undefined || !options.includes(String(value))
+                ? options[0] || ''
                 : String(value)
-          } else if (fieldTypeName === 'ZodNumber' || fieldTypeName === 'number') {
+          } else if (fieldTypeName === 'number') {
             const num = Number(value)
             acc[key] = isNaN(num) ? 0 : num
-          } else if (fieldTypeName === 'ZodArray' || fieldTypeName === 'array') {
+          } else if (fieldTypeName === 'array') {
             // For arrays, the value should already be an array from the database
             // Handle null values properly
             if (Array.isArray(value)) {
@@ -201,9 +198,9 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
           }
           return acc
         },
-        {} as Record<string, any>
+        {} as Record<string, unknown>
       )
-      form.reset(processedInitialValues as any)
+      form.reset(processedInitialValues as z.input<typeof schema>)
       setTimeout(() => {
         isInitializingRef.current = false
       }, 0)
@@ -212,25 +209,22 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
     }
   }, [initialValues, form, schema])
 
-  const renderField = (fieldName: string, fieldSchema: ZodTypeAny) => {
+  const renderField = (fieldName: string, fieldSchema: z.core.$ZodType) => {
     const baseType = unwrapZodType(fieldSchema)
-    // Support both old (typeName) and new (type) Zod formats
-    const getTypeName = (def: Record<string, any>) => def.typeName || def.type
-    const typeName = getTypeName(getZodDef(baseType))
-    const description = fieldSchema.description
+    const typeName = getZodDef(baseType).type
+    const description = zDescription(fieldSchema)
 
     return (
       <FormField
         key={fieldName}
         control={form.control}
-        name={fieldName as any}
+        name={fieldName as FieldPath<z.input<typeof schema>>}
         render={({ field }) => {
           const labelConfig = labels?.[fieldName]
           const label =
             typeof labelConfig === 'string' ? labelConfig : labelConfig?.label || fieldName
           const typeDisplay = columnInfo?.[fieldName]?.data_type || ''
           switch (typeName) {
-            case 'ZodString':
             case 'string':
               return (
                 <FormItem className="py-6 border-b">
@@ -253,7 +247,6 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
                   </div>
                 </FormItem>
               )
-            case 'ZodNumber':
             case 'number':
               return (
                 <FormItem className="py-6 border-b">
@@ -282,7 +275,6 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
                   </div>
                 </FormItem>
               )
-            case 'ZodBoolean':
             case 'boolean':
               return (
                 <FormItem className="py-6 border-b flex flex-row items-center justify-between gap-8">
@@ -297,9 +289,8 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
                   </FormControl>
                 </FormItem>
               )
-            case 'ZodEnum':
             case 'enum':
-              const options = getZodDef(baseType).values
+              const options = enumValues(baseType)
               const optionLabels = typeof labelConfig === 'object' ? labelConfig.options : undefined
               return (
                 <FormItem className="py-6 border-b">
@@ -336,7 +327,6 @@ export function DynamicForm<T extends z.ZodRawShape = z.ZodRawShape>({
                   </div>
                 </FormItem>
               )
-            case 'ZodArray':
             case 'array':
               return (
                 <FormItem className="py-6 border-b">

@@ -50,7 +50,7 @@ export const columnFilterSchema = z.object({
   date: z
     .string()
     .transform((val) => val.split(RANGE_DELIMITER).map(Number))
-    .pipe(z.coerce.date().array())
+    .pipe(z.coerce.date<number>().array())
     .optional(),
   auth_user: z.string().optional(),
 })
@@ -58,7 +58,7 @@ export const columnFilterSchema = z.object({
 export type ColumnFilterSchema = z.infer<typeof columnFilterSchema>
 
 export const facetMetadataSchema = z.object({
-  rows: z.array(z.object({ value: z.any(), total: z.number() })),
+  rows: z.array(z.object({ value: z.any().optional(), total: z.number() })),
   total: z.number(),
   min: z.number().optional(),
   max: z.number().optional(),
@@ -73,7 +73,7 @@ export const timelineChartSchema = z.object({
   ...LEVELS.reduce(
     (acc, level) => ({
       ...acc,
-      [level]: z.number().default(0),
+      [level]: z.number().nonoptional().prefault(0),
     }),
     {} as Record<(typeof LEVELS)[number], z.ZodNumber>
   ),

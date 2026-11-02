@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
@@ -6,7 +5,14 @@ import { AnimatePresence, motion } from 'motion/react'
 import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
+import {
+  Button,
+  DialogSectionSeparator,
+  Form,
+  formOutputResolver,
+  SheetFooter,
+  SheetSection,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
@@ -195,7 +201,7 @@ export const DestinationForm = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
-    resolver: zodResolver(
+    resolver: formOutputResolver(
       FormSchema.superRefine((data, ctx) => {
         const addRequiredFieldError = (path: string, message: string) => {
           ctx.addIssue({

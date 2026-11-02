@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import type {
   CreateOAuthClientParams,
   OAuthClient,
@@ -18,6 +17,7 @@ import {
   FormDescription,
   FormField,
   FormLabel,
+  formOutputResolver,
   Input,
   Select,
   SelectContent,
@@ -61,17 +61,18 @@ const FormSchema = z.object({
     .string()
     .min(1, 'Please provide a name for your OAuth app')
     .max(100, 'Name must be less than 100 characters'),
-  type: z.enum(['manual', 'dynamic']).default('manual'),
+  type: z.enum(['manual', 'dynamic']).nonoptional().prefault('manual'),
   redirect_uris: z
     .object({
       value: z.string().trim().url('Please provide a valid URL'),
     })
     .array()
     .min(1, 'At least one redirect URI is required'),
-  client_type: z.enum(['public', 'confidential']).default('confidential'),
+  client_type: z.enum(['public', 'confidential']).nonoptional().prefault('confidential'),
   token_endpoint_auth_method: z
     .enum(['client_secret_basic', 'client_secret_post', 'none'])
-    .default('client_secret_basic'),
+    .nonoptional()
+    .prefault('client_secret_basic'),
   client_id: z.string().optional(),
   client_secret: z.string().optional(),
   logo_uri: z.string().optional(),
@@ -107,7 +108,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
   const isPublicClient = appToEdit?.client_type === 'public'
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: initialValues,
   })
 

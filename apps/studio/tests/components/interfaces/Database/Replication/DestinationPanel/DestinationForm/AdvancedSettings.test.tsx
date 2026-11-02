@@ -1,8 +1,7 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
-import { Form } from 'ui'
+import { Form, formOutputResolver } from 'ui'
 import { describe, expect, it } from 'vitest'
 
 import { AdvancedSettings } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/AdvancedSettings'
@@ -22,7 +21,7 @@ const numericFields = [
 
 const TestForm = () => {
   const form = useForm<DestinationPanelSchemaType>({
-    resolver: zodResolver(DestinationPanelFormSchema),
+    resolver: formOutputResolver(DestinationPanelFormSchema),
     mode: 'onChange',
     reValidateMode: 'onChange',
     defaultValues: {

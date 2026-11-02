@@ -385,7 +385,7 @@ export function update(
 }
 
 export const pgFunctionDeleteZod = z.object({
-  cascade: z.boolean().default(false).optional(),
+  cascade: z.boolean().optional(),
   type: pgRoutineKindZod.optional(),
 })
 

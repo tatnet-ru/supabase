@@ -91,7 +91,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           path: ['name'],
         })
     } else {
-      return z.object({})
+      return z.object({ name: z.string().optional() })
     }
   }
 
@@ -124,7 +124,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
     try {
       let folderId = selectedId
 
-      if (selectedId === 'new-folder' && 'name' in values) {
+      if (selectedId === 'new-folder' && values.name !== undefined) {
         const { id } = await createFolder({
           projectRef: ref,
           name: values.name,

@@ -20,7 +20,8 @@ export const getReportTools = (ctx: ToolContext = {}) => {
           .int()
           .positive()
           .max(100)
-          .default(20)
+          .nonoptional()
+          .prefault(20)
           .describe('Max number of reports to return.'),
       }),
       execute: async ({ limit }, { abortSignal }) => {

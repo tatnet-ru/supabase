@@ -62,8 +62,8 @@ export const TokenFormSchema = z
     expiresAt: z.enum(EXPIRY_PRESETS),
     customExpiryDate: z.string().datetime().optional(),
     resourceAccess: z.enum(RESOURCE_ACCESS_MODES),
-    organizationSlugs: z.string().array().optional().default([]),
-    projectRefs: z.string().array().optional().default([]),
+    organizationSlugs: z.string().array().optional().nonoptional().prefault([]),
+    projectRefs: z.string().array().optional().nonoptional().prefault([]),
     permissions: z.record(z.string(), z.enum(['none', 'read', 'readwrite'])),
   })
   .superRefine((data, ctx) => {

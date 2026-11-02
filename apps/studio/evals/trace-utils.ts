@@ -103,7 +103,10 @@ export async function getParsedToolSpans<
 const projectContextPrefix = "The user's current project is "
 
 const threadTextBlockSchema = z.object({ type: z.literal('text'), text: z.string() })
-const threadToolCallArgumentsSchema = z.object({ type: z.literal('valid'), value: z.unknown() })
+const threadToolCallArgumentsSchema = z.object({
+  type: z.literal('valid'),
+  value: z.unknown().optional(),
+})
 const threadToolCallBlockSchema = z.object({
   type: z.literal('tool_call'),
   tool_name: z.string(),

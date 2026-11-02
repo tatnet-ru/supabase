@@ -28,14 +28,19 @@ const policySchema = z.object({
   check: z.string().optional().describe('The WITH CHECK clause expression (for INSERT, UPDATE).'),
   action: z
     .enum(['PERMISSIVE', 'RESTRICTIVE'])
-    .default('PERMISSIVE')
+    .nonoptional()
+    .prefault('PERMISSIVE')
     .describe('Whether the policy is PERMISSIVE or RESTRICTIVE.'),
-  roles: z.array(z.string()).default(['public']).describe('The roles this policy applies to.'),
+  roles: z
+    .array(z.string())
+    .nonoptional()
+    .prefault(['public'])
+    .describe('The roles this policy applies to.'),
 })
 
 const requestBodySchema = z.object({
   tableName: z.string().min(1),
-  schema: z.string().default('public'),
+  schema: z.string().nonoptional().prefault('public'),
   columns: z.array(z.string()).optional(),
   projectRef: z.string().min(1),
   connectionString: z.string().min(1),

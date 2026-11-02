@@ -12,7 +12,6 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircleIcon, ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
@@ -31,6 +30,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  formOutputResolver,
   Input,
   SidePanel,
 } from 'ui'
@@ -62,8 +62,12 @@ const EditEnumeratedTypeSidePanel = ({
   })
 
   const FormSchema = z.object({
-    name: z.string().min(1, 'Please provide a name for your enumerated type').default(''),
-    description: z.string().default('').optional(),
+    name: z
+      .string()
+      .min(1, 'Please provide a name for your enumerated type')
+      .nonoptional()
+      .prefault(''),
+    description: z.string().optional(),
     values: z
       .object({
         isNew: z.boolean(),
@@ -71,11 +75,12 @@ const EditEnumeratedTypeSidePanel = ({
         updatedValue: z.string().min(1, 'Please provide a value'),
       })
       .array()
-      .default([]),
+      .nonoptional()
+      .prefault([]),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: {
       name: '',
       description: '',

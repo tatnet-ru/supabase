@@ -1,11 +1,10 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, cn, Form, FormControl, FormField, Separator } from 'ui'
+import { Button, cn, Form, FormControl, FormField, formOutputResolver, Separator } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
@@ -25,7 +24,7 @@ const recoveryPasswordSchema = z.object({
   password: passwordValidation,
 })
 
-type FormData = z.infer<typeof passwordSchema>
+type FormData = z.infer<typeof recoveryPasswordSchema>
 
 export const ResetPasswordForm = () => {
   const router = useRouter()
@@ -37,7 +36,7 @@ export const ResetPasswordForm = () => {
   const [currentPasswordHidden, setCurrentPasswordHidden] = useState(true)
 
   const form = useForm<FormData>({
-    resolver: zodResolver(requireCurrentPassword ? passwordSchema : recoveryPasswordSchema),
+    resolver: formOutputResolver(requireCurrentPassword ? passwordSchema : recoveryPasswordSchema),
     defaultValues: { password: '', currentPassword: '' },
     mode: 'onChange',
   })

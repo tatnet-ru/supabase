@@ -290,8 +290,12 @@ describe('toolSetValidationSchema', () => {
     const result = toolSetValidationSchema.safeParse(toolsWithUnknown)
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues).toHaveLength(2) // Two unknown tools
-      expect(result.error.issues[0].message).toContain('Invalid enum value')
+      expect(result.error.issues).toEqual([
+        expect.objectContaining({
+          code: 'unrecognized_keys',
+          keys: ['unknown_tool', 'another_unknown'],
+        }),
+      ])
     }
   })
 

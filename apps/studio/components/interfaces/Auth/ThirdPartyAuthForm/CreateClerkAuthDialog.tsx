@@ -44,11 +44,11 @@ const FormSchema = z
       !val.domain.match(/https:\/\/[a-z0-9-]+[.]clerk[.]accounts[.]dev\/?$/)
     ) {
       ctx.addIssue({
-        code: z.ZodIssueCode.invalid_string,
+        code: z.ZodIssueCode.invalid_format,
         path: ['domain'],
         message:
           'Production Clerk domains use HTTPS and start with the clerk subdomain (https://clerk.example.com). Development Clerk domains use HTTPS and end with .clerk.accounts.dev (https://example.clerk.accounts.dev).',
-        validation: 'regex',
+        format: 'regex',
       })
     }
   })

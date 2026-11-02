@@ -17,7 +17,7 @@ import {
 import { z } from 'zod'
 
 const FormSchema = z.object({
-  mobile: z.boolean().default(false).optional(),
+  mobile: z.boolean().optional(),
 })
 
 export default function CheckboxReactHookFormSingle() {

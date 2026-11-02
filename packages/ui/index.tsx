@@ -172,3 +172,5 @@ export * from './src/components/KeyboardShortcut/KeyboardShortcut'
 
 export * as colors from './src/lib/tailwind-demo-classes'
 export * from './src/lib/constants'
+
+export { formOutputResolver, dynamicFormResolver } from './src/lib/form-output-resolver'

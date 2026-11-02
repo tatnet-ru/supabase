@@ -16,8 +16,8 @@ export type ToolContext = {
 export type ToolContract<TInput = unknown, TOutput = unknown> = {
   name: string
   description: string
-  inputSchema: z.ZodType<TInput, z.ZodTypeDef, unknown>
-  outputSchema: z.ZodType<TOutput, z.ZodTypeDef, unknown>
+  inputSchema: z.ZodType<TInput, unknown>
+  outputSchema: z.ZodType<TOutput, unknown>
   /** Lowest opt-in level at which the tool runs. `null` means always available. */
   minOptInLevel: AiOptInLevel | null
   needsApproval: boolean

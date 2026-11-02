@@ -1,4 +1,4 @@
-import { routes, type Redirect, type VercelConfig } from '@vercel/config/v1'
+import type { Header, Redirect, Rewrite } from '@vercel/routing-utils'
 
 import {
   getMaintenanceRedirects,
@@ -8,6 +8,13 @@ import {
   type StudioRedirect,
 } from './redirects.shared'
 import { getSecurityHeaders } from './security-headers'
+
+export type VercelConfig = {
+  framework?: null
+  headers?: Header[]
+  redirects?: Redirect[]
+  rewrites?: Rewrite[]
+}
 
 // STUDIO_FRAMEWORK gates the TanStack Start deploy. When the env var is
 // unset (the default — used by the Next.js prod deploy) this file returns
@@ -28,7 +35,7 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 // Headers for a given prefix ('' for root, or a base path like '/dashboard').
 // Run once per prefix and concatenated so no rule is hand-duplicated.
-function headersFor(prefix: string) {
+function headersFor(prefix: string): Header[] {
   return [
     // Security headers for every response. The Next build sets these via
     // next.config.ts `headers()`; the TanStack build serves a static shell
@@ -37,21 +44,33 @@ function headersFor(prefix: string) {
     { source: `${prefix}/(.*)`, headers: getSecurityHeaders() },
     // Deployment metadata sets its own cache policy based on lookup success.
     // All other API paths retain the private default, including nested paths.
-    routes.cacheControl(`${prefix}/api/((?!get-deployment-commit/?$).*)`, {
-      private: true,
-      noStore: true,
-    }),
-    routes.cacheControl(`${prefix}/_serverFn/(.*)`, { private: true, noStore: true }),
+    {
+      source: `${prefix}/api/((?!get-deployment-commit/?$).*)`,
+      headers: [{ key: 'Cache-Control', value: 'private, no-store' }],
+    },
+    {
+      source: `${prefix}/_serverFn/(.*)`,
+      headers: [{ key: 'Cache-Control', value: 'private, no-store' }],
+    },
     // Hashed chunks are covered by Nitro (`/_vercel/immutable/*`, immutable).
     // Static images and favicons aren't content-hashed, so they can't be
     // `immutable`, but they change rarely — mirror next.config's
     // `cache-control` for these paths (img: max-age=2592000 = 30 days,
     // favicon: max-age=86400 = 1 day).
-    routes.cacheControl(`${prefix}/img/(.*)`, { public: true, maxAge: '30days' }),
-    routes.cacheControl(`${prefix}/favicon/(.*)`, { public: true, maxAge: '1day' }),
+    {
+      source: `${prefix}/img/(.*)`,
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000' }],
+    },
+    {
+      source: `${prefix}/favicon/(.*)`,
+      headers: [{ key: 'Cache-Control', value: 'public, max-age=86400' }],
+    },
     // Deno declarations are public TypeScript assets. Keep this override
     // scoped to /deno so dynamic response types remain handler-owned.
-    routes.header(`${prefix}/deno/(.*)\\.ts`, [{ key: 'content-type', value: 'text/typescript' }]),
+    {
+      source: `${prefix}/deno/(.*)\\.ts`,
+      headers: [{ key: 'content-type', value: 'text/typescript' }],
+    },
   ]
 }
 
@@ -101,9 +120,9 @@ function buildTanstackConfig(): VercelConfig {
     // preset should route on top of it.
     framework: null,
     redirects: buildRedirects(),
-    rewrites: [routes.rewrite(wellKnownFlags, `https://supabase.com${wellKnownFlags}`)],
+    rewrites: [{ source: wellKnownFlags, destination: `https://supabase.com${wellKnownFlags}` }],
     headers: [
-      routes.header(wellKnownFlags, [{ key: 'content-type', value: 'application/json' }]),
+      { source: wellKnownFlags, headers: [{ key: 'content-type', value: 'application/json' }] },
       // When a base path is configured, emit both the prefixed and root rule
       // sets (prefixed first so it wins for explicit /dashboard/* hits, root
       // as a fallback for bare-domain traffic).
@@ -117,8 +136,6 @@ const passthrough: VercelConfig = {}
 
 export const config: VercelConfig = isTanstack ? buildTanstackConfig() : passthrough
 
-// Belt-and-braces: local @vercel/config CLI reads module.default, but the
-// docs claim Vercel's platform looks for a named `config` export. Export
-// both so whichever path runs wins.
+// Expose both module forms for configuration loaders.
 // eslint-disable-next-line no-restricted-exports
 export default config

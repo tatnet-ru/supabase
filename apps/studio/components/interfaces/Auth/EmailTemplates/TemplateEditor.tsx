@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
@@ -13,6 +12,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   Label,
   Tooltip,
@@ -143,7 +143,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
 
   const form = useForm({
     defaultValues: INITIAL_VALUES,
-    resolver: zodResolver(template.validationSchema),
+    resolver: formOutputResolver(template.validationSchema),
   })
 
   const onSubmit = (values: z.infer<typeof template.validationSchema>) => {
@@ -165,8 +165,8 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
       {
         projectRef,
         template: {
-          subject: payload[subjectKey],
-          content: payload[messageSlug],
+          subject: typeof payload[subjectKey] === 'string' ? payload[subjectKey] : '',
+          content: typeof payload[messageSlug] === 'string' ? payload[messageSlug] : '',
         },
       },
       {
@@ -313,7 +313,16 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                       }
                     >
                       <FormControl>
-                        <Input id={x} {...field} readOnly={!canEdit} />
+                        <Input
+                          id={x}
+                          {...field}
+                          value={
+                            typeof field.value === 'string' || typeof field.value === 'number'
+                              ? field.value
+                              : ''
+                          }
+                          readOnly={!canEdit}
+                        />
                       </FormControl>
                     </FormItemLayout>
                   )}

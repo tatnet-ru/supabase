@@ -59,6 +59,6 @@ export interface AuthTemplate {
     }
   }
   variables: TemplateVariable[]
-  validationSchema: z.AnyZodObject
+  validationSchema: z.ZodObject<Record<string, z.ZodType<string | number | boolean | undefined>>>
   misc: { emailTemplateType: 'authentication' | 'security' }
 }

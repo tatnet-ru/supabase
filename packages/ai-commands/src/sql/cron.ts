@@ -93,7 +93,8 @@ export async function generateCron(openai: OpenAI, prompt: string) {
     })
 
     // Parse the JSON string in arguments using jsonrepair
-    const functionArgs = response?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments
+    const toolCall = response?.choices?.[0]?.message?.tool_calls?.[0]
+    const functionArgs = toolCall?.type === 'function' ? toolCall.function.arguments : undefined
     if (!functionArgs) {
       throw new Error('No cron expression generated')
     }

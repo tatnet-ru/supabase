@@ -89,7 +89,9 @@ export const AUTH_TOP_ERROR_CODES_SQL_OTEL = safeSql`
   limit 10
 `
 
-const countSchema = z.union([z.number(), z.string().min(1)]).pipe(z.coerce.number().finite())
+const countSchema = z
+  .union([z.number(), z.string().min(1)])
+  .pipe(z.coerce.number<string | number>().finite())
 const responseErrorSchema = z.object({
   method: z.string(),
   path: z.string(),

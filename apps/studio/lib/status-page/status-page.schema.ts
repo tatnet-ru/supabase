@@ -21,7 +21,7 @@ const Base = {
   url: z.string(),
   last_update_at: z.string(),
   last_update_message: z.string().nullish(),
-  affected_components: z.array(AffectedComponentSchema).default([]),
+  affected_components: z.array(AffectedComponentSchema).nonoptional().prefault([]),
 }
 
 export const WidgetIncidentSchema = z.object({
@@ -47,7 +47,8 @@ export const WidgetScheduledMaintenanceSchema = z.object({
 function tolerantArray<T extends z.ZodTypeAny>(itemSchema: T, arrayName: string) {
   return z
     .array(z.unknown())
-    .default([])
+    .nonoptional()
+    .prefault([])
     .transform(
       (items): Array<z.output<T>> =>
         items.flatMap((item) => {

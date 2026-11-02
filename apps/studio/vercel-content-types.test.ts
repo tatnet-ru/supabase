@@ -3,12 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 const require = createRequire(import.meta.url)
-const sdkRequire = createRequire(require.resolve('@vercel/config/v1'))
-const { getTransformedRoutes } = sdkRequire('@vercel/routing-utils')
+const { getTransformedRoutes } = require('@vercel/routing-utils')
 const compiledConfigSchema = z.object({
-  error: z.unknown(),
+  error: z.unknown().optional(),
   routes: z
-    .array(z.object({ src: z.string().optional(), headers: z.record(z.string()).optional() }))
+    .array(
+      z.object({ src: z.string().optional(), headers: z.record(z.string(), z.string()).optional() })
+    )
     .nullable(),
 })
 

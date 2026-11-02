@@ -39,10 +39,11 @@
     "recharts": "catalog:",
     "sonner": "^1.5.0",
     "tailwindcss": "catalog:",
-    "vaul": "^1.1.2"
+    "vaul": "^1.1.2",
+    "@hookform/resolvers": "^5.2.2",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@hookform/resolvers": "^3.1.1",
     "@testing-library/dom": "^10.0.0",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",

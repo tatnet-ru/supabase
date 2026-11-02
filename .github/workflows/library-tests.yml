@@ -23,6 +23,7 @@ on:
       - '.github/workflows/library-tests.yml'
       - '.github/scripts/check-katex-rendering.mjs'
       - '.github/scripts/check-graphql-security.mjs'
+      - '.github/scripts/check-zod-security.mjs'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -54,10 +55,22 @@ jobs:
       - run: node .github/scripts/check-provider-utils-download.mjs
       - run: node .github/scripts/check-katex-rendering.mjs
       - run: node .github/scripts/check-graphql-security.mjs
+      - run: node .github/scripts/check-zod-security.mjs
+      - run: pnpm --filter ui exec vitest run src/lib/form-output-resolver.test.ts
       - run: pnpm --filter @supabase/vue-blocks run typecheck
       - run: pnpm --filter kb test
       - run: pnpm --filter lite-studio build
       - run: pnpm --filter library test
+      - name: Check migrated form schemas
+        run: >-
+          pnpm --filter studio exec vitest run
+          lib/ai/tool-filter.test.ts
+          lib/ai/tools/incident-tools.test.ts
+          lib/ai/tools/studio-tools.test.ts
+          tests/components/UnifiedLogs/LogSelectionActions.utils.test.ts
+          components/interfaces/Integrations/Wrappers/Wrappers.utils.test.ts
+      - run: pnpm --filter library typecheck
+      - run: pnpm --filter design-system typecheck
       - run: pnpm --filter library build:registry
       - name: Check generated registry
         run: |

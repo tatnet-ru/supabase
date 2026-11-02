@@ -104,8 +104,8 @@ export const otlpConfigSchema = z.object({
     invalidMessage: 'OTLP endpoint must be a valid URL',
     prefixMessage: 'OTLP endpoint must start with http:// or https://',
   }),
-  protocol: z.string().optional().default('http/protobuf'),
-  gzip: z.boolean().optional().default(true),
+  protocol: z.string().optional().nonoptional().prefault('http/protobuf'),
+  gzip: z.boolean().optional().nonoptional().prefault(true),
   headers: z.record(z.string(), z.string()).optional(),
 })
 

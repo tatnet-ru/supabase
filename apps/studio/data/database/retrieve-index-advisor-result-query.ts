@@ -64,7 +64,7 @@ export async function getIndexAdvisorResult({
 
   const parsed = IndexAdvisorResultSchema.safeParse(results[0])
   if (!parsed.success) {
-    const firstError = parsed.error.errors[0]
+    const firstError = parsed.error.issues[0]
     const errorPath = firstError.path.length > 0 ? ` at path: ${firstError.path.join('.')}` : ''
     console.error(
       `Invalid index advisor response${errorPath}: ${firstError.message}. Received: ${JSON.stringify(results[0])}`

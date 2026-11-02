@@ -15,31 +15,25 @@ function formatInvalidEmailSnippet(token: string): string {
 export const emailSchema = z
   .string()
   .min(1, 'At least one email address is required')
-  .refine(
-    (val) => {
-      const emails = parseEmails(val)
-      if (emails.length === 0) return false
-      return emails.every((e) => z.string().email().safeParse(e).success)
-    },
-    (val) => {
-      const emails = parseEmails(val)
-      const invalid = emails.find((e) => !z.string().email().safeParse(e).success)
-      return {
+  .superRefine((val, ctx) => {
+    const emails = parseEmails(val)
+    const invalid = emails.find((email) => !z.string().email().safeParse(email).success)
+    if (emails.length === 0 || invalid) {
+      ctx.addIssue({
+        code: 'custom',
         message: invalid
           ? `Invalid email address: "${formatInvalidEmailSnippet(invalid)}"`
           : 'At least one email address is required',
-      }
+      })
     }
-  )
-  .refine(
-    (val) => parseEmails(val).length <= MAX_BATCH_INVITE_SIZE,
-    (val) => {
-      const count = parseEmails(val).length
-      return {
+    const count = emails.length
+    if (count > MAX_BATCH_INVITE_SIZE) {
+      ctx.addIssue({
+        code: 'custom',
         message: `You can invite up to ${MAX_BATCH_INVITE_SIZE} members at a time. Remove ${count - MAX_BATCH_INVITE_SIZE} email ${count - MAX_BATCH_INVITE_SIZE === 1 ? 'address' : 'addresses'} to continue.`,
-      }
+      })
     }
-  )
+  })
 
 export function parseEmails(value: string): string[] {
   const emails = value

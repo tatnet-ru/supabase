@@ -12,10 +12,7 @@ const REQUIRED_ERROR = 'Value is required'
 describe('requiredNumberInputSchema', () => {
   const schema = requiredNumberInputSchema(
     z
-      .number({
-        required_error: REQUIRED_ERROR,
-        invalid_type_error: REQUIRED_ERROR,
-      })
+      .number({ error: (issue) => (issue.input === undefined ? REQUIRED_ERROR : REQUIRED_ERROR) })
       .min(1, 'Must be greater than 0')
   )
 
@@ -61,7 +58,7 @@ describe('optionalNumberInputSchema', () => {
 describe('preprocessEmptyNumberInput', () => {
   const schema = preprocessEmptyNumberInput(
     z.coerce
-      .number({ required_error: REQUIRED_ERROR, invalid_type_error: REQUIRED_ERROR })
+      .number({ error: (issue) => (issue.input === undefined ? REQUIRED_ERROR : REQUIRED_ERROR) })
       .min(0, 'Must be 0 or larger')
   )
 
@@ -82,7 +79,7 @@ describe('preprocessEmptyNumberInput', () => {
   it('accepts an empty string when the inner schema is optional', () => {
     const optionalSchema = preprocessEmptyNumberInput(
       z.coerce
-        .number({ required_error: REQUIRED_ERROR, invalid_type_error: REQUIRED_ERROR })
+        .number({ error: (issue) => (issue.input === undefined ? REQUIRED_ERROR : REQUIRED_ERROR) })
         .min(0, 'Must be 0 or larger')
         .optional()
     )

@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
@@ -15,6 +14,7 @@ import {
   FormField,
   FormInputGroupInput,
   FormMessage,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -249,7 +249,7 @@ export const RealtimeSettings = () => {
   }
 
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: {
       ...REALTIME_DEFAULT_CONFIG,
       allow_public: !REALTIME_DEFAULT_CONFIG.private_only,

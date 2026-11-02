@@ -44,6 +44,31 @@ const stripe_wrapper = {
 }
 
 describe('getWrapperCreationFormSchema', () => {
+  it('strips unknown and inactive mode fields while retaining dynamic options', () => {
+    const schema = getWrapperCreationFormSchema(stripe_wrapper)
+    const value = schema.parse({
+      mode: 'tables',
+      server_name: 'stripe_server',
+      tables: [
+        {
+          index: 0,
+          columns: [],
+          is_new_schema: false,
+          schema: 'public',
+          schema_name: 'public',
+          table_name: 'accounts',
+        },
+      ],
+      api_key_id: 'secret',
+      api_url: 'https://api.stripe.com/v1',
+      source_schema: 'hidden',
+      unexpected: 'drop',
+    })
+    expect(value).toMatchObject({ mode: 'tables', api_key_id: 'secret' })
+    expect(value).not.toHaveProperty('source_schema')
+    expect(value).not.toHaveProperty('unexpected')
+  })
+
   it('should build a schema that validates tables mode', () => {
     const schema = getWrapperCreationFormSchema(stripe_wrapper)
     const result = schema.safeParse({ mode: 'tables' })
@@ -93,6 +118,26 @@ describe('getWrapperCreationFormSchema', () => {
 })
 
 describe('getEditionFormSchema', () => {
+  it('strips unknown fields from wrapper updates', () => {
+    const value = getEditionFormSchema(stripe_wrapper).parse({
+      server_name: 'stripe_server',
+      tables: [
+        {
+          index: 0,
+          columns: [],
+          is_new_schema: false,
+          schema: 'public',
+          schema_name: 'public',
+          table_name: 'accounts',
+        },
+      ],
+      api_key_id: 'secret',
+      unexpected: 'drop',
+    })
+    expect(value).toMatchObject({ server_name: 'stripe_server', api_key_id: 'secret' })
+    expect(value).not.toHaveProperty('unexpected')
+  })
+
   it('should build a schema that validates wrapper specific options', () => {
     const schema = getEditionFormSchema(stripe_wrapper)
     const result = schema.safeParse({ mode: 'tables' })

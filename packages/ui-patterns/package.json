@@ -756,7 +756,7 @@
     }
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.1.1",
+    "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "catalog:",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
@@ -778,7 +778,7 @@
     "monaco-editor": "*",
     "motion": "catalog:",
     "next-themes": "catalog:",
-    "openai": "^4.75.1",
+    "openai": "^6.7.0",
     "prism-react-renderer": "^2.3.1",
     "radix-ui": "catalog:",
     "react": "catalog:",

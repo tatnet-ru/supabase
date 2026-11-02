@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const blockChunkSchema = z.object({
   name: z.string(),
   description: z.string(),
-  component: z.any(),
+  component: z.any().optional(),
   file: z.string(),
   code: z.string().optional(),
   container: z
@@ -51,7 +51,7 @@ export type Registry = z.infer<typeof registrySchema>
 export const blockSchema = registryEntrySchema.extend({
   type: z.literal('components:block'),
   style: z.enum(['default', 'new-york']),
-  component: z.any(),
+  component: z.any().optional(),
   container: z
     .object({
       height: z.string().optional(),

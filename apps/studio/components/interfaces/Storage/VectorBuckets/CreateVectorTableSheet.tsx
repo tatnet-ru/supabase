@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { literal, safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PlusIcon, Trash2Icon } from 'lucide-react'
@@ -11,6 +10,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -84,7 +84,7 @@ const FormSchema = z.object({
     .min(1, 'Dimension must be at least 1')
     .max(4096, 'Dimension must be at most 4096'),
   distanceMetric: z.enum(['cosine', 'euclidean'], {
-    required_error: 'Please select a distance metric',
+    error: (issue) => (issue.input === undefined ? 'Please select a distance metric' : undefined),
   }),
   metadataKeys: z
     .array(
@@ -92,7 +92,8 @@ const FormSchema = z.object({
         value: z.string().min(1, 'The metadata key needs to be at least 1 character long'),
       })
     )
-    .default([]),
+    .nonoptional()
+    .prefault([]),
 })
 
 const formId = 'create-vector-table-form'
@@ -129,7 +130,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     metadataKeys: [],
   }
   const form = useForm<CreateVectorTableForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues,
     values: defaultValues as any,
   })

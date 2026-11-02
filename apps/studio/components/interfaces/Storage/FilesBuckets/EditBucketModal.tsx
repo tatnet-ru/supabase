@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
@@ -17,6 +16,7 @@ import {
   FormControl,
   FormField,
   FormMessage,
+  formOutputResolver,
   Input,
   Select,
   SelectContent,
@@ -169,7 +169,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   }
 
   const form = useForm<BucketFormValues>({
-    resolver: zodResolver(EditBucketFormSchema),
+    resolver: formOutputResolver(EditBucketFormSchema),
     defaultValues,
     values: defaultValues,
     // Show numeric versioning bounds as the user types, not only on submit.

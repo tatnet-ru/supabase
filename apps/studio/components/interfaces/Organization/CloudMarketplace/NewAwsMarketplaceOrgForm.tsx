@@ -1,6 +1,5 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
-import { Form } from 'ui'
+import { Form, formOutputResolver } from 'ui'
 
 import {
   ORG_KIND_DEFAULT,
@@ -20,7 +19,7 @@ export type NewMarketplaceOrgForm = OrganizationDetailsFormValues
 
 export const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
   const form = useForm<NewMarketplaceOrgForm>({
-    resolver: zodResolver(organizationDetailsSchema),
+    resolver: formOutputResolver(organizationDetailsSchema),
     defaultValues: {
       name: '',
       kind: ORG_KIND_DEFAULT,

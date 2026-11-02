@@ -17,9 +17,7 @@ export const LinkSupportTicketFormSchema = z.object({
       ExtendedSupportCategories,
       ...ExtendedSupportCategories[],
     ],
-    {
-      required_error: 'Please select a category',
-    }
+    { error: (issue) => (issue.input === undefined ? 'Please select a category' : undefined) }
   ),
   allowSupportAccess: z.boolean(),
 })

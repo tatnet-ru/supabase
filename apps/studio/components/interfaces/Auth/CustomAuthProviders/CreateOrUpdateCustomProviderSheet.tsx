@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import type { CustomOAuthProvider } from '@supabase/auth-js'
 import { useParams } from 'common'
 import { XIcon } from 'lucide-react'
@@ -12,6 +11,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  formOutputResolver,
   Input,
   InputGroup,
   InputGroupAddon,
@@ -61,28 +61,41 @@ const SharedFormSchema = z.object({
     .string()
     .min(1, 'Please provide a name for your custom provider')
     .max(100, 'Name must be less than 100 characters'),
-  provider_type: z.enum(['oidc', 'oauth2']).default('oidc'),
+  provider_type: z.enum(['oidc', 'oauth2']).nonoptional().prefault('oidc'),
   client_id: z.string().min(1, 'Please provide a client ID').trim(),
   client_secret: z.string().min(1, 'Please provide a client secret').trim(),
-  email_optional: z.boolean().default(false),
+  email_optional: z.boolean().nonoptional().prefault(false),
   issuer: z.string().url('Please provide a valid URL').trim(),
   // comma-separated scopes in the form, will be transformed to array when sending
-  scopes: z.string().default(''),
+  scopes: z.string().nonoptional().prefault(''),
 })
 
 const OidcSchema = SharedFormSchema.extend({
   provider_type: z.literal('oidc'),
-  discovery_url: z.union([z.string().url('Please provide a valid URL'), z.literal('')]).default(''),
+  discovery_url: z
+    .union([z.string().url('Please provide a valid URL'), z.literal('')])
+    .nonoptional()
+    .prefault(''),
 })
 
 const OAuth2Schema = SharedFormSchema.extend({
   provider_type: z.literal('oauth2'),
   authorization_url: z
     .union([z.string().url('Please provide a valid URL'), z.literal('')])
-    .default(''),
-  token_url: z.union([z.string().url('Please provide a valid URL'), z.literal('')]).default(''),
-  userinfo_url: z.union([z.string().url('Please provide a valid URL'), z.literal('')]).default(''),
-  jwks_uri: z.union([z.string().url('Please provide a valid URL'), z.literal('')]).default(''),
+    .nonoptional()
+    .prefault(''),
+  token_url: z
+    .union([z.string().url('Please provide a valid URL'), z.literal('')])
+    .nonoptional()
+    .prefault(''),
+  userinfo_url: z
+    .union([z.string().url('Please provide a valid URL'), z.literal('')])
+    .nonoptional()
+    .prefault(''),
+  jwks_uri: z
+    .union([z.string().url('Please provide a valid URL'), z.literal('')])
+    .nonoptional()
+    .prefault(''),
 })
 
 const FormSchema = z.discriminatedUnion('provider_type', [OidcSchema, OAuth2Schema])
@@ -116,7 +129,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
   const { ref: projectRef } = useParams()
   const { hostEndpoint: endpointData } = useProjectApiUrl({ projectRef })
   const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues: initialValues,
   })
 

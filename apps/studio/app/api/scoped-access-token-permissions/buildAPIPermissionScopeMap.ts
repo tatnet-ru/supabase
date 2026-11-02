@@ -191,7 +191,7 @@ const OPEN_API_PATH_ITEM_SCHEMA = z.preprocess(
           Object.entries(item).filter(([key]) => (HTTP_METHODS as readonly string[]).includes(key))
         )
       : item,
-  z.record(z.enum(HTTP_METHODS), OPEN_API_PATH_METHOD_SCHEMA)
+  z.partialRecord(z.enum(HTTP_METHODS), OPEN_API_PATH_METHOD_SCHEMA)
 )
 
 const API_SPECS_SCHEMA = z.object({

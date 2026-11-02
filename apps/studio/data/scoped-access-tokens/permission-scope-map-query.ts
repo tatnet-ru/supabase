@@ -182,9 +182,9 @@ const scopeMapEntrySchema = z.object({
 // per entry, which a strict schema would turn into all-or-nothing. `.catch({})` empties a field
 // whose record shape is wrong without discarding the salvageable rest of the payload.
 const rawPermissionScopeMapSchema = z.object({
-  scopes: z.record(scopeMapEntrySchema).catch({}),
-  endpoints: z.record(z.unknown()).catch({}),
-  mcp_tools: z.record(z.unknown()).catch({}),
+  scopes: z.record(z.string(), scopeMapEntrySchema).catch({}),
+  endpoints: z.record(z.string(), z.unknown()).catch({}),
+  mcp_tools: z.record(z.string(), z.unknown()).catch({}),
 })
 
 const EMPTY_PERMISSION_SCOPE_MAP: PermissionScopeMap = { scopes: {}, endpoints: {}, mcp_tools: {} }

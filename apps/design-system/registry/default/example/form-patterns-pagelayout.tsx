@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
 import { ExternalLink, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
@@ -15,6 +14,7 @@ import {
   FormField,
   FormInputGroupInput,
   FormInputGroupTextArea,
+  formOutputResolver,
   Input,
   InputGroup,
   InputGroupAddon,
@@ -118,7 +118,7 @@ export default function FormPatternsPageLayout() {
   const [isDragging, setIsDragging] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: formOutputResolver(formSchema),
     defaultValues: {
       name: '',
       description: '',

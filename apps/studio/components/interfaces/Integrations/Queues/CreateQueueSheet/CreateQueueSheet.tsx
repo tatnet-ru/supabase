@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -6,6 +5,7 @@ import { toast } from 'sonner'
 import {
   Button,
   Form,
+  formOutputResolver,
   Separator,
   Sheet,
   SheetContent,
@@ -59,7 +59,7 @@ export const CreateQueueSheet = ({ visible, onClose }: CreateQueueSheetProps) =>
   )
 
   const form = useForm<CreateQueueForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: formOutputResolver(FormSchema),
     defaultValues,
   })
 

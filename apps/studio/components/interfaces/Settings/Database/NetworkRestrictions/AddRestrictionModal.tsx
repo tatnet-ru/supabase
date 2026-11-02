@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { HelpCircleIcon } from 'lucide-react'
 import { useEffect } from 'react'
@@ -16,6 +15,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   Tooltip,
   TooltipContent,
@@ -80,15 +80,16 @@ const AddRestrictionModal = ({
     ipAddress: z
       .string()
       .min(1, `Please enter a valid IP address`)
-      .ip({
-        version: type === 'IPv4' ? 'v4' : 'v6',
-        message: `Please enter a valid ${type} address`,
-      })
+      .check(
+        type === 'IPv4'
+          ? z.ipv4({ error: `Please enter a valid ${type} address` })
+          : z.ipv6({ error: `Please enter a valid ${type} address` })
+      )
       .refine((val) => !checkIfPrivate(type, val), 'Private IP addresses are not supported'),
   })
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: formOutputResolver(formSchema),
     defaultValues: {
       ipAddress: '',
       cidrBlockSize: type === 'IPv4' ? IPV4_MAX_CIDR_BLOCK_SIZE : IPV6_MAX_CIDR_BLOCK_SIZE,
