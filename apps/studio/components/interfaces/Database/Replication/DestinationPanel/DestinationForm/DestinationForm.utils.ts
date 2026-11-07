@@ -46,7 +46,7 @@ import {
   type CreateS3AccessKeyCredentialVariables,
   type S3AccessKeyCreateData,
 } from '@/data/storage/s3-access-key-create-mutation'
-import { type ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const normalizeOptionalString = (value?: string) => {
   const trimmed = value?.trim()
@@ -171,7 +171,11 @@ export const buildTableSyncCopyConfig = ({
   if (mode === 'include_all_tables' || mode === 'skip_all_tables') return { type: mode }
 
   if (selectedTableIds.length === 0) {
-    throw new Error('Select at least one table for the initial sync.')
+    throw new Error(
+      mode === 'skip_tables'
+        ? 'Select at least one table to exclude from the initial sync.'
+        : 'Select at least one table for the initial sync.'
+    )
   }
 
   const tableIds = selectedTableIds.map(Number)
@@ -411,7 +415,7 @@ export const buildDestinationConfig = async ({
   data: z.infer<typeof DestinationPanelFormSchema>
   createS3AccessKey: UseMutateAsyncFunction<
     S3AccessKeyCreateData,
-    ResponseError,
+    StudioError,
     CreateS3AccessKeyCredentialVariables,
     unknown
   >

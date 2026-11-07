@@ -1,6 +1,5 @@
 'use client'
 
-import { formOutputResolver } from 'ui'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -18,6 +17,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   Input,
   InputGroup,
   InputGroupAddon,

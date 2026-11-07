@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, renderHook, type RenderOptions } from '@testing-library/react'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
+import { useState } from 'react'
 import { TooltipProvider } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 
@@ -21,17 +22,19 @@ export const CustomWrapper = ({
   nuqs?: AdapterProps
   profileContext?: ProfileContextType
 }) => {
-  const _queryClient =
-    queryClient ??
-    new QueryClient({
-      defaultOptions: {
-        queries: { retry: false },
-        mutations: { retry: false },
-      },
-    })
+  const [defaultQueryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false },
+        },
+      })
+  )
+  const stableQueryClient = queryClient ?? defaultQueryClient
 
   const content = (
-    <QueryClientProvider client={_queryClient}>
+    <QueryClientProvider client={stableQueryClient}>
       <NuqsTestingAdapter {...nuqs}>
         <TooltipProvider>
           <CommandProvider openKey="">{children}</CommandProvider>
