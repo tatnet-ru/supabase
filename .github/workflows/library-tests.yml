@@ -25,6 +25,7 @@ on:
       - '.github/scripts/check-katex-rendering.mjs'
       - '.github/scripts/check-graphql-security.mjs'
       - '.github/scripts/check-zod-security.mjs'
+      - '.github/scripts/check-flat-routes-security.mjs'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -60,6 +61,7 @@ jobs:
       - run: pnpm --filter ui exec vitest run src/lib/form-output-resolver.test.ts
       - run: pnpm --filter @supabase/vue-blocks run typecheck
       - run: pnpm --filter kb test
+      - run: node .github/scripts/check-flat-routes-security.mjs
       - run: pnpm --filter lite-studio build
       - run: pnpm --filter library test
       - name: Check migrated form schemas

@@ -156,4 +156,5 @@ overrides:
   '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
 
 patchedDependencies:
+  '@react-router/fs-routes@7.18.4': patches/@react-router__fs-routes@7.18.4.patch
   react-data-grid: patches/react-data-grid.patch
