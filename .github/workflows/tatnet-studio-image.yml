@@ -45,6 +45,8 @@ jobs:
           components/layouts/AuthLayout/AuthLayout.utils.test.ts
           components/interfaces/Auth/SmtpForm/SmtpForm.test.tsx
           tests/components/Functions
+          components/interfaces/Functions/FunctionsEmptyState.test.tsx
+          tests/lib/custom-render.test.tsx
       - name: Lint Studio
         run: pnpm --filter studio run lint
       - name: Check TatNet patch formatting

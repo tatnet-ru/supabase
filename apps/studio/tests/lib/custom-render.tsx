@@ -58,26 +58,30 @@ type CustomRenderOpts = RenderOptions & {
 
 export const customRender = (component: React.ReactElement, renderOptions?: CustomRenderOpts) => {
   return render(component, {
-    wrapper: ({ children }) =>
-      CustomWrapper({
-        queryClient: renderOptions?.queryClient,
-        nuqs: renderOptions?.nuqs,
-        profileContext: renderOptions?.profileContext,
-        children,
-      }),
+    wrapper: ({ children }) => (
+      <CustomWrapper
+        queryClient={renderOptions?.queryClient}
+        nuqs={renderOptions?.nuqs}
+        profileContext={renderOptions?.profileContext}
+      >
+        {children}
+      </CustomWrapper>
+    ),
     ...renderOptions,
   })
 }
 
 export const customRenderHook = <T,>(hook: () => T, renderOptions?: CustomRenderOpts) => {
   return renderHook(hook, {
-    wrapper: ({ children }) =>
-      CustomWrapper({
-        children,
-        queryClient: renderOptions?.queryClient,
-        nuqs: renderOptions?.nuqs,
-        profileContext: renderOptions?.profileContext,
-      }),
+    wrapper: ({ children }) => (
+      <CustomWrapper
+        queryClient={renderOptions?.queryClient}
+        nuqs={renderOptions?.nuqs}
+        profileContext={renderOptions?.profileContext}
+      >
+        {children}
+      </CustomWrapper>
+    ),
     ...renderOptions,
   })
 }
