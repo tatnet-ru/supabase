@@ -1,9 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@supabase/supabase-js'
-import { ImageResponse } from '@vercel/og'
+import { Resvg } from '@resvg/resvg-js'
+import satori from 'satori'
 import useTicketBg from 'components/LaunchWeek/15/hooks/use-ticket-bg'
 
-export const runtime = 'edge' // 'nodejs' is the default
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic' // defaults to auto
 export const fetchCache = 'force-no-store'
 export const revalidate = 0
@@ -107,7 +108,7 @@ export async function GET(req: Request) {
     const USERNAME_FONT_SIZE = 40
     const TICKET_BOTTOM_TEXT_FONT_SIZE = 20
 
-    const generatedTicketImage = new ImageResponse(
+    const generatedTicketSvg = await satori(
       <>
         <div
           style={{
@@ -470,6 +471,11 @@ export async function GET(req: Request) {
             style: 'normal',
           },
         ],
+      }
+    )
+    const generatedTicketImage = new Response(
+      new Uint8Array(new Resvg(generatedTicketSvg).render().asPng()),
+      {
         headers: {
           'content-type': 'image/png',
           'cache-control': 'public, max-age=31536000, s-maxage=31536000, no-transform, immutable',
