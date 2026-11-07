@@ -22,3 +22,17 @@ describe('TatNet self-hosted features', () => {
     expect(AUTH_EMAIL_TEMPLATES_ENABLED).toBe(enabled)
   })
 })
+
+describe('TatNet managed MCP guide', () => {
+  it.each([
+    [false, undefined, true],
+    [false, 'false', false],
+    [true, undefined, false],
+    [true, 'true', false],
+  ])('platform=%s override=%s shows managed guide=%s', async (platform, override, enabled) => {
+    vi.stubEnv('NEXT_PUBLIC_IS_PLATFORM', String(platform))
+    vi.stubEnv('NEXT_PUBLIC_TATNET_MANAGED_MCP', override)
+    const { TATNET_MANAGED_MCP_ENABLED } = await import('./index')
+    expect(TATNET_MANAGED_MCP_ENABLED).toBe(enabled)
+  })
+})
