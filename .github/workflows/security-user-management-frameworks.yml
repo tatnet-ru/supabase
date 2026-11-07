@@ -1,0 +1,36 @@
+name: User management framework security checks
+
+on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - 'examples/user-management/sveltekit-user-management/**'
+      - '.github/scripts/check-sveltekit-user-management.mjs'
+      - '.github/scripts/check-framework-example-audit.mjs'
+      - '.github/workflows/security-user-management-frameworks.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  sveltekit-build-and-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      PUBLIC_SUPABASE_PUBLISHABLE_KEY: fixture-key
+    defaults:
+      run:
+        working-directory: examples/user-management/sveltekit-user-management
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+      - run: npm install --ignore-scripts
+      - run: npm run check
+      - run: npm run build
+      - run: node .github/scripts/check-sveltekit-user-management.mjs
+        working-directory: .
+      - run: node .github/scripts/check-framework-example-audit.mjs examples/user-management/sveltekit-user-management
+        working-directory: .

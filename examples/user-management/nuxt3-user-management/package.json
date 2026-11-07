@@ -9,10 +9,15 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "^3.4.4",
-    "@nuxtjs/supabase": "^1.6.2",
+    "@nuxtjs/supabase": "^2.1.0",
     "@types/node": "^22.0.0",
-    "nuxt": "^3.21.11",
+    "nuxt": "^4.6.2",
     "typescript": "^5.9.3",
     "vue-tsc": "^3.3.14"
-  }
+  },
+  "overrides": {
+    "glob@>=9 <14.0.2": "^14.0.2",
+    "minimatch@>=7 <11.0.1": "^11.0.1"
+  },
+  "type": "module"
 }

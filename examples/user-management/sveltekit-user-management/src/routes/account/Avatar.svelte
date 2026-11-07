@@ -12,7 +12,7 @@
 
 	let avatarUrl: string | null = $state(null)
 	let uploading = $state(false)
-	let files: FileList = $state()
+	let files: FileList | undefined = $state()
 
 	const downloadImage = async (path: string) => {
 		try {
