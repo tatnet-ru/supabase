@@ -32,8 +32,8 @@ permissions:
 
 jobs:
   knip:
-    # Uses larger hosted runner as it significantly decreases build times
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    # The TatNet fork uses GitHub-hosted runners; upstream Blacksmith is unavailable.
+    runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: --max-old-space-size=6144
 
