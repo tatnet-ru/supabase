@@ -16,6 +16,10 @@ on:
       - 'pnpm-workspace.yaml'
   workflow_dispatch:
     inputs:
+      checks_only:
+        description: 'Run checks without publishing a container'
+        type: boolean
+        default: false
       tag:
         description: 'Image tag (e.g. 2026.10.12-tatnet1)'
         required: true
@@ -81,7 +85,7 @@ jobs:
         run: pnpm --filter studio build
 
   build:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.checks_only != true
     needs: checks
     permissions:
       contents: read

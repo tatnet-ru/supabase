@@ -1,6 +1,7 @@
 name: Studio Dead Code (knip)
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
