@@ -9,11 +9,13 @@ import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 // `routes/__root.tsx` (TanStack) — so the asset path can't drift between them.
 export function configureMonacoLoader() {
   if (typeof window !== 'undefined') {
+    // Language workers fetch scripts without a document base, so local
+    // assets also need an absolute URL rather than a root-relative path.
     loader.config({
       paths: {
         vs: IS_PLATFORM
           ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs'
-          : `${BASE_PATH}/monaco-editor/vs`,
+          : new URL(`${BASE_PATH}/monaco-editor/vs`, window.location.origin).href,
       },
     })
   }
