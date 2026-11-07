@@ -14,7 +14,7 @@ export function TatnetMcpGuide() {
           authorized through your TatNet account, separately from Studio.
         </p>
       </div>
-      <CodeBlock value={MCP_URL} language="text" hideLineNumbers />
+      <CodeBlock value={MCP_URL} hideLineNumbers />
       <ol className="list-decimal space-y-3 pl-5 text-sm text-foreground-light">
         <li>In ChatGPT, open Plugins, select Add, then Add custom MCP server.</li>
         <li>
@@ -42,7 +42,7 @@ export function TatnetMcpGuide() {
             Open ChatGPT plugins
           </a>
         </Button>
-        <Button asChild type="default">
+        <Button asChild variant="outline">
           <a href="https://min.tatnet.ru/api-keys" target="_blank" rel="noopener noreferrer">
             Manage or revoke access
           </a>
