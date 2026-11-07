@@ -19,6 +19,7 @@ it('keeps cached queries connected to invalidation after rerender', async () => 
         <span>{label}</span>
         <p>{data}</p>
         <button
+          tabIndex={0}
           type="button"
           onClick={() => client.invalidateQueries({ queryKey: ['provider-fixture'] })}
         >
