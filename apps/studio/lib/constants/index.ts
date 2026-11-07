@@ -4,6 +4,11 @@ export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 
+// This image serves TatNet-managed databases. Disable at build time when
+// reusing the fork for an independent self-hosted deployment.
+export const TATNET_MANAGED_MCP_ENABLED =
+  !IS_PLATFORM && process.env.NEXT_PUBLIC_TATNET_MANAGED_MCP !== 'false'
+
 /**
  * TatNet fork: Edge Functions write UI (deploy buttons) in self-hosted mode.
  * On the TatNet platform the edge intercepts the Management API
