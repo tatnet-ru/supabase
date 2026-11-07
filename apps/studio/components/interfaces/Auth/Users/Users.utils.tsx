@@ -19,8 +19,8 @@ import { HeaderCell } from './UsersGridComponents'
 import { User } from '@/data/auth/users-infinite-query'
 import { BASE_PATH } from '@/lib/constants'
 
-const GITHUB_AVATAR_URL = 'https://avatars.githubusercontent.com'
-const SUPPORTED_CSP_AVATAR_URLS = [GITHUB_AVATAR_URL, 'https://lh3.googleusercontent.com']
+const GITHUB_AVATAR_ORIGIN = 'https://avatars.githubusercontent.com'
+const SUPPORTED_CSP_AVATAR_ORIGINS = [GITHUB_AVATAR_ORIGIN, 'https://lh3.googleusercontent.com']
 
 const isCustomProvider = (provider: string) => provider.startsWith('custom:')
 
@@ -251,15 +251,22 @@ export function getAvatarUrl(user: User): string | undefined {
     '') as unknown
 
   if (typeof url !== 'string') return undefined
-  const isSupported = SUPPORTED_CSP_AVATAR_URLS.some((x) => url.startsWith(x))
 
-  // [Joshen] Only for GH, not entirely sure whats the image transformation equiv for Google
   try {
-    const _url = new URL(url)
-    _url.searchParams.set('s', '24')
-    return isSupported ? (url.startsWith(GITHUB_AVATAR_URL) ? _url.href : url) : undefined
-  } catch (error) {
-    return isSupported ? url : undefined
+    const parsedUrl = new URL(url)
+    if (
+      !SUPPORTED_CSP_AVATAR_ORIGINS.includes(parsedUrl.origin) ||
+      parsedUrl.username ||
+      parsedUrl.password
+    ) {
+      return undefined
+    }
+
+    // GitHub supports this size parameter; preserve Google's existing transformation.
+    if (parsedUrl.origin === GITHUB_AVATAR_ORIGIN) parsedUrl.searchParams.set('s', '24')
+    return parsedUrl.href
+  } catch {
+    return undefined
   }
 }
 
