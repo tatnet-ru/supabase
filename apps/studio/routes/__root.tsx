@@ -247,7 +247,11 @@ function buildRootHead(faviconRoute = FAVICON_ROUTE) {
 
   const links: Array<Record<string, string>> = [
     ...genFaviconLinks(BASE_PATH, faviconRoute),
-    { rel: 'manifest', href: `${BASE_PATH}${faviconRoute}/manifest.json` },
+    {
+      rel: 'manifest',
+      href: `${BASE_PATH}${faviconRoute}/manifest.json`,
+      crossOrigin: 'use-credentials',
+    },
   ]
 
   if (IS_PLATFORM) {
