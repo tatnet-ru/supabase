@@ -20,6 +20,7 @@ import {
   resolveConnectSheetHydration,
 } from './ConnectSheet.utils'
 import { ConnectStepsSection } from './ConnectStepsSection'
+import { TatnetMcpGuide } from './TatnetMcpGuide'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
@@ -28,11 +29,14 @@ import { WarehouseTab } from './WarehouseTab'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { TATNET_MANAGED_MCP_ENABLED } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const ConnectSheet = () => {
   const track = useTrack()
+  const deploymentMode = useDeploymentMode()
   const prevShowConnect = useRef(false)
   const { ref: projectRef } = useParams()
 
@@ -166,6 +170,9 @@ export const ConnectSheet = () => {
     }
   }
 
+  const isManagedMcp =
+    state.mode === 'mcp' && TATNET_MANAGED_MCP_ENABLED && deploymentMode.isSelfHosted
+
   return (
     <Sheet open={showConnect} onOpenChange={handleOpenChange}>
       <SheetContent
@@ -188,28 +195,30 @@ export const ConnectSheet = () => {
                 />
               </div>
 
-              {state.mode === 'warehouse' ? (
-                <WarehouseTab />
-              ) : (
-                <>
-                  {activeFields.length > 0 && (
-                    <div className="p-8">
-                      <ConnectConfigSection
-                        state={state}
-                        activeFields={activeFields}
-                        onFieldChange={handleFieldChange}
-                        getFieldOptions={getFieldOptions}
-                      />
-                    </div>
-                  )}
+              {isManagedMcp && <TatnetMcpGuide />}
+              {!isManagedMcp &&
+                (state.mode === 'warehouse' ? (
+                  <WarehouseTab />
+                ) : (
+                  <>
+                    {activeFields.length > 0 && (
+                      <div className="p-8">
+                        <ConnectConfigSection
+                          state={state}
+                          activeFields={activeFields}
+                          onFieldChange={handleFieldChange}
+                          getFieldOptions={getFieldOptions}
+                        />
+                      </div>
+                    )}
 
-                  <ConnectStepsSection
-                    steps={resolvedSteps}
-                    state={state}
-                    projectKeys={projectKeys}
-                  />
-                </>
-              )}
+                    <ConnectStepsSection
+                      steps={resolvedSteps}
+                      state={state}
+                      projectKeys={projectKeys}
+                    />
+                  </>
+                ))}
             </div>
           </ScrollViewport>
           <ScrollBar />
