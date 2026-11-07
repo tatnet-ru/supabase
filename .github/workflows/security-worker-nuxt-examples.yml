@@ -9,6 +9,7 @@ on:
       - 'examples/user-management/nuxt3-user-management/**'
       - '.github/scripts/check-nuxt-security-example.mjs'
       - '.github/scripts/check-worker-examples.mjs'
+      - '.github/scripts/check-framework-example-audit.mjs'
       - '.github/workflows/security-worker-nuxt-examples.yml'
 
 permissions:
@@ -38,8 +39,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     env:
-      SUPABASE_URL: http://127.0.0.1:54321
-      SUPABASE_KEY: fixture-key
+      NUXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NUXT_PUBLIC_SUPABASE_KEY: fixture-key
       NUXT_TELEMETRY_DISABLED: '1'
     defaults:
       run:
@@ -49,8 +50,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '26'
-      - run: npm install --ignore-scripts --package-lock=false
+      - run: npm install --ignore-scripts
       - run: npm run build
       - run: npx --no-install nuxi typecheck
       - run: node .github/scripts/check-nuxt-security-example.mjs examples/user-management/nuxt3-user-management
+        working-directory: .
+      - run: node .github/scripts/check-framework-example-audit.mjs examples/user-management/nuxt3-user-management
         working-directory: .
