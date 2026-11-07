@@ -1,4 +1,3 @@
-import { formOutputResolver } from 'ui'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import {
@@ -14,6 +13,7 @@ import {
   Form,
   FormControl,
   FormField,
+  formOutputResolver,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,

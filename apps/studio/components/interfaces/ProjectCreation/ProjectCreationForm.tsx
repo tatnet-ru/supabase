@@ -1,5 +1,4 @@
 import { acceptUntrustedSql, joinSqlFragments, untrustedSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -28,6 +27,7 @@ import {
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  AUTO_REGION_VALUE,
   getAvailableRegions,
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
@@ -66,8 +66,9 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from '@/data/projects/project-create-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import {
   isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
@@ -118,7 +119,16 @@ export const ProjectCreationForm = ({
   const { profile } = useProfile()
   const { slug, projectName, externalId } = useParams()
   const trackFunnelError = useTrackFunnelError()
-  const defaultProvider = useDefaultProvider()
+  const defaultProviderFromHook = useDefaultProvider()
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+  // On staging, ~50% of new projects default to v3 (AWS_K8S). Rolled once per mount; the
+  // internal-only "Cloud provider" selector can still override it.
+  const [defaultProvider] = useState<CloudProvider>(() => {
+    const canDefaultToV3 =
+      process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' &&
+      (validCloudProviders?.includes('AWS_K8S') ?? true)
+    return canDefaultToV3 && Math.random() < 0.5 ? 'AWS_K8S' : PROVIDERS[defaultProviderFromHook].id
+  })
 
   const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
@@ -128,10 +138,9 @@ export const ProjectCreationForm = ({
   const canChooseInstanceSize = !isFreePlan
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
-  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
-  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.github_connections'
+  const { can: isAdmin } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE)
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
   const { hasAccess: hasAccessToGitHubIntegration } = useCheckEntitlements(
@@ -171,7 +180,7 @@ export const ProjectCreationForm = ({
       instanceType: '',
       kubernetesClusterId: '',
       kubernetesClusterForce: false,
-      cloudProvider: PROVIDERS[defaultProvider].id,
+      cloudProvider: defaultProvider,
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
@@ -307,8 +316,14 @@ export const ProjectCreationForm = ({
         )
       : undefined
   const recommendedSmartRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
+    ? availableRegionsData?.recommendations.smartGroup?.name
     : ''
+
+  const firstAvailableSmartRegion = highAvailability
+    ? undefined
+    : availableRegionsData?.all.smartGroup[0]?.name
+  const isAutoRegionAvailable =
+    smartRegionEnabled && !highAvailability && availableRegionsData?.all.auto !== undefined
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
@@ -318,7 +333,9 @@ export const ProjectCreationForm = ({
       highAvailability === true && highAvailabilityRegionCode !== undefined,
     highAvailabilityRegionName: highAvailabilityRegion?.name,
     isSmartRegionEnabled: smartRegionEnabled,
+    isAutoRegionAvailable,
     recommendedSmartRegion,
+    firstAvailableSmartRegion,
     autoDefaultRegion,
     fixedDefaultRegion,
   })
@@ -369,7 +386,6 @@ export const ProjectCreationForm = ({
         ? getRegionSelectionType({
             dbRegion: form.getValues('dbRegion'),
             availableRegions: availableRegionsData?.all,
-            isDbRegionDirty,
           })
         : undefined
       track(
@@ -502,10 +518,11 @@ export const ProjectCreationForm = ({
       availableOrioleVersion,
     })
 
-    const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion = smartRegionEnabled
-      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
-      : undefined
+    const { auto, smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+    const selectedExplicitRegion =
+      smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
+    const selectedSmartRegion = dbRegion === AUTO_REGION_VALUE ? auto : selectedExplicitRegion
+    const selectedRegion = smartRegionEnabled ? selectedSmartRegion : undefined
 
     if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
       return toast.error(

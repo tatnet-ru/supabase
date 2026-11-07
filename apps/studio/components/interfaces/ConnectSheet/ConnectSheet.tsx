@@ -1,8 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
-import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
+import {
+  cn,
+  ScrollBar,
+  ScrollRoot,
+  ScrollViewport,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from 'ui'
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
@@ -19,7 +28,7 @@ import { useConnectState } from './useConnectState'
 import { WarehouseTab } from './WarehouseTab'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { TATNET_MANAGED_MCP_ENABLED } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -111,9 +120,8 @@ export const ConnectSheet = () => {
 
   const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
   const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
 
@@ -176,40 +184,45 @@ export const ConnectSheet = () => {
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden divide-y">
-          <div className="p-8">
-            <ModeSelector
-              modes={availableModes}
-              selected={state.mode}
-              onChange={handleModeChange}
-            />
-          </div>
-
-          {isManagedMcp && <TatnetMcpGuide />}
-          {!isManagedMcp &&
-            (state.mode === 'warehouse' ? (
-              <WarehouseTab />
-            ) : (
-              <>
-                {activeFields.length > 0 && (
-                  <div className="p-8">
-                    <ConnectConfigSection
-                      state={state}
-                      activeFields={activeFields}
-                      onFieldChange={handleFieldChange}
-                      getFieldOptions={getFieldOptions}
-                    />
-                  </div>
-                )}
-
-                <ConnectStepsSection
-                  steps={resolvedSteps}
-                  state={state}
-                  projectKeys={projectKeys}
+        <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <ScrollViewport className="[&>div]:block!">
+            <div className="flex min-w-0 flex-col divide-y">
+              <div className="p-8">
+                <ModeSelector
+                  modes={availableModes}
+                  selected={state.mode}
+                  onChange={handleModeChange}
                 />
-              </>
-            ))}
-        </div>
+              </div>
+
+              {isManagedMcp && <TatnetMcpGuide />}
+              {!isManagedMcp &&
+                (state.mode === 'warehouse' ? (
+                  <WarehouseTab />
+                ) : (
+                  <>
+                    {activeFields.length > 0 && (
+                      <div className="p-8">
+                        <ConnectConfigSection
+                          state={state}
+                          activeFields={activeFields}
+                          onFieldChange={handleFieldChange}
+                          getFieldOptions={getFieldOptions}
+                        />
+                      </div>
+                    )}
+
+                    <ConnectStepsSection
+                      steps={resolvedSteps}
+                      state={state}
+                      projectKeys={projectKeys}
+                    />
+                  </>
+                ))}
+            </div>
+          </ScrollViewport>
+          <ScrollBar />
+        </ScrollRoot>
       </SheetContent>
     </Sheet>
   )

@@ -21,7 +21,9 @@ Deno.serve(
           'list_todos',
           {
             description: 'List the todos of the signed-in user',
-            inputSchema: z.object({ limit: z.number().int().min(1).max(100).default(20) }),
+            inputSchema: z.object({
+              limit: z.number().int().min(1).max(100).nonoptional().prefault(20),
+            }),
             annotations: { readOnlyHint: true },
           },
           async ({ limit }) => {

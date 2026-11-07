@@ -1,5 +1,5 @@
 # Build the TatNet self-hosted fork and publish it to the organization package.
-# Upstream base: self-hosted/v0.8.3 (Studio 2026.10.12).
+# Upstream base: self-hosted/v0.8.4 (2026-11-05).
 # Keep the self-hosted function editor, secrets, deletion, email templates,
 # and SMTP settings patches when updating the upstream base.
 name: tatnet-studio-image
@@ -16,6 +16,10 @@ on:
       - 'pnpm-workspace.yaml'
   workflow_dispatch:
     inputs:
+      checks_only:
+        description: 'Run checks without publishing a container'
+        type: boolean
+        default: false
       tag:
         description: 'Image tag (e.g. 2026.10.12-tatnet1)'
         required: true
@@ -45,6 +49,10 @@ jobs:
           components/layouts/AuthLayout/AuthLayout.utils.test.ts
           components/interfaces/Auth/SmtpForm/SmtpForm.test.tsx
           tests/components/Functions
+          components/interfaces/Functions/FunctionsEmptyState.test.tsx
+          tests/lib/custom-render.test.tsx
+          components/interfaces/Auth/Users/Users.utils.test.ts
+          components/interfaces/ConnectSheet/ConnectSheet.test.tsx
       - name: Lint Studio
         run: pnpm --filter studio run lint
       - name: Check TatNet patch formatting
@@ -70,8 +78,16 @@ jobs:
       - name: Typecheck Studio
         run: pnpm --filter studio run typecheck
 
+      - name: Build self-hosted Studio
+        env:
+          NEXT_PUBLIC_IS_PLATFORM: 'false'
+          NEXT_PUBLIC_STUDIO_AUTH_MODE: supabase
+          SKIP_ASSET_UPLOAD: '1'
+          NEXT_TELEMETRY_DISABLED: '1'
+        run: pnpm --filter studio build
+
   build:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.checks_only != true
     needs: checks
     permissions:
       contents: read

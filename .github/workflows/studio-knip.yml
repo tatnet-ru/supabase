@@ -1,6 +1,7 @@
 name: Studio Dead Code (knip)
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -32,8 +33,8 @@ permissions:
 
 jobs:
   knip:
-    # The TatNet fork uses GitHub-hosted runners; upstream Blacksmith is unavailable.
-    runs-on: ubuntu-latest
+    # Uses larger hosted runner as it significantly decreases build times
+    runs-on: ${{ github.repository_owner == 'tatnet-ru' && 'ubuntu-24.04' || 'blacksmith-4vcpu-ubuntu-2404' }}
     env:
       NODE_OPTIONS: --max-old-space-size=6144
 

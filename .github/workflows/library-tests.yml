@@ -1,6 +1,7 @@
 name: Library checks
 
 on:
+  workflow_dispatch:
   # No branch filter: a stacked pull request targets the branch below it, and
   # skipping its checks until the stack reaches master defeats the point.
   pull_request:
@@ -65,8 +66,8 @@ jobs:
         run: >-
           pnpm --filter studio exec vitest run
           lib/ai/tool-filter.test.ts
-          lib/ai/tools/incident-tools.test.ts
-          lib/ai/tools/studio-tools.test.ts
+          lib/ai/tools/get-active-incidents.server.test.ts
+          lib/ai/tools/core-tools.server.test.ts
           tests/components/UnifiedLogs/LogSelectionActions.utils.test.ts
           components/interfaces/Integrations/Wrappers/Wrappers.utils.test.ts
       - run: pnpm --filter library typecheck
