@@ -159,7 +159,7 @@ write(
 )
 fs.chmodSync(path.join(fixture, 'scripts/upload-static-assets.sh'), 0o755)
 fs.symlinkSync(
-  path.join(repoRoot, 'node_modules/.bin/turbo'),
+  path.join(repoRoot, 'node_modules/turbo/bin/turbo'),
   path.join(fixture, 'node_modules/.bin/turbo')
 )
 fs.symlinkSync(path.join(repoRoot, 'node_modules/turbo'), path.join(fixture, 'node_modules/turbo'))

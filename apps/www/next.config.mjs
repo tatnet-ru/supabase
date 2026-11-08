@@ -39,6 +39,7 @@ const withBundleAnalyzer = bundleAnalyzer({
  */
 const nextConfig = {
   basePath: '',
+  serverExternalPackages: ['@resvg/resvg-js', 'satori'],
   assetPrefix: getAssetPrefix(),
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,

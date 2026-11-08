@@ -1,0 +1,47 @@
+name: Workspace dependency and renderer security checks
+
+on:
+  pull_request:
+    branches: ['tatnet/2026.10.12']
+    paths:
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'apps/www/app/api-v2/ticket-og/**'
+      - 'apps/www/package.json'
+      - 'apps/www/next.config.mjs'
+      - 'apps/www/vitest.config.ts'
+      - 'apps/www/turbo-build.test.ts'
+      - '.github/scripts/check-ticket-og-production.mjs'
+      - '.github/scripts/check-workspace-security-audit.mjs'
+      - '.github/workflows/security-workspace-renderer.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  production-regressions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NODE_OPTIONS: --max-old-space-size=12288
+      NEXT_PUBLIC_SUPABASE_URL: https://ticket-fixture.example
+      LIVE_SUPABASE_COM_SERVICE_ROLE_KEY: fixture-service-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v6
+        with:
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts --filter www... --filter studio...
+      - run: node .github/scripts/check-workspace-security-audit.mjs
+      - run: pnpm --filter www exec eslint app/api-v2/ticket-og/route.tsx app/api-v2/ticket-og/route.test.ts next.config.mjs vitest.config.ts turbo-build.test.ts
+      - run: pnpm --filter www exec vitest run --retry=0
+      - run: pnpm --filter studio exec vitest run lib/api/self-hosted --retry=0
+      - run: pnpm --filter www run content:build:core
+      - run: pnpm --filter www exec next typegen
+      - run: pnpm --filter www exec tsc --noEmit --incremental false
+      - run: pnpm --filter www exec next build --webpack --experimental-build-mode compile
+      - run: node .github/scripts/check-ticket-og-production.mjs

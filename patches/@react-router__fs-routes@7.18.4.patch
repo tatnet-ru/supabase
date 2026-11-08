@@ -1,0 +1,46 @@
+diff --git a/dist/index.js b/dist/index.js
+index 4742dd040e56d4db0a6043be0577d93300b5a00a..87e67b67b225e0fc41e666182ba2a83e1ec6e9ff 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -133,7 +133,7 @@ var PrefixLookupTrie = class {
+   }
+ };
+ function flatRoutes(appDirectory, ignoredFilePatterns = [], prefix = "routes") {
+-  let ignoredFileRegex = Array.from(/* @__PURE__ */ new Set(["**/.*", ...ignoredFilePatterns])).map((re) => (0, import_minimatch.makeRe)(re)).filter((re) => !!re);
++  let ignoredFileMatchers = Array.from(/* @__PURE__ */ new Set(["**/.*", ...ignoredFilePatterns])).map((pattern) => new import_minimatch.Minimatch(pattern));
+   let routesDir = import_node_path2.default.join(appDirectory, prefix);
+   let rootRoute = findFile(appDirectory, "root", routeModuleExts);
+   if (!rootRoute) {
+@@ -158,10 +158,10 @@ function flatRoutes(appDirectory, ignoredFilePatterns = [], prefix = "routes") {
+       route = findRouteModuleForFolder(
+         appDirectory,
+         filepath,
+-        ignoredFileRegex
++        ignoredFileMatchers
+       );
+     } else if (entry.isFile()) {
+-      route = findRouteModuleForFile(appDirectory, filepath, ignoredFileRegex);
++      route = findRouteModuleForFile(appDirectory, filepath, ignoredFileMatchers);
+     }
+     if (route) routes.push(route);
+   }
+@@ -267,15 +267,15 @@ function flatRoutesUniversal(appDirectory, routes, prefix = "routes") {
+   }
+   return routeManifest;
+ }
+-function findRouteModuleForFile(appDirectory, filepath, ignoredFileRegex) {
++function findRouteModuleForFile(appDirectory, filepath, ignoredFileMatchers) {
+   let relativePath = normalizeSlashes(import_node_path2.default.relative(appDirectory, filepath));
+-  let isIgnored = ignoredFileRegex.some((regex) => regex.test(relativePath));
++  let isIgnored = ignoredFileMatchers.some((matcher) => matcher.match(relativePath));
+   if (isIgnored) return null;
+   return filepath;
+ }
+-function findRouteModuleForFolder(appDirectory, filepath, ignoredFileRegex) {
++function findRouteModuleForFolder(appDirectory, filepath, ignoredFileMatchers) {
+   let relativePath = import_node_path2.default.relative(appDirectory, filepath);
+-  let isIgnored = ignoredFileRegex.some((regex) => regex.test(relativePath));
++  let isIgnored = ignoredFileMatchers.some((matcher) => matcher.match(relativePath));
+   if (isIgnored) return null;
+   let routeRouteModule = findFile(filepath, "route", routeModuleExts);
+   let routeIndexModule = findFile(filepath, "index", routeModuleExts);
