@@ -54,6 +54,7 @@ jobs:
           tests/lib/custom-render.test.tsx
           components/interfaces/Auth/Users/Users.utils.test.ts
           components/interfaces/ConnectSheet/ConnectSheet.test.tsx
+          components/interfaces/APIKeys
       - name: Lint Studio
         run: pnpm --filter studio run lint
       - name: Check TatNet patch formatting
