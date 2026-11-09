@@ -43,12 +43,13 @@ jobs:
       - name: Test self-hosted integrations
         working-directory: apps/studio
         run: >-
-          pnpm exec vitest run
+          pnpm exec vitest run --retry=0
           lib/constants/tatnet.test.ts
           lib/sentry-client-options.test.ts
           components/layouts/AuthLayout/AuthLayout.utils.test.ts
           components/interfaces/Auth/SmtpForm/SmtpForm.test.tsx
           tests/components/Functions
+          components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.platform.test.tsx
           components/interfaces/Functions/FunctionsEmptyState.test.tsx
           tests/lib/custom-render.test.tsx
           components/interfaces/Auth/Users/Users.utils.test.ts

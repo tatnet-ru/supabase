@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
@@ -66,14 +66,14 @@ const mockApiKeys = () => {
   return requests
 }
 
-const mockFunctionDeps = () => {
+const mockFunctionDeps = (name = 'hello') => {
   addAPIMock({
     method: 'get',
     path: '/v1/projects/:ref/functions/:function_slug',
     response: {
       id: 'fn-id',
       slug: 'hello',
-      name: 'hello',
+      name,
       status: 'ACTIVE',
       version: 1,
       created_at: 1,
@@ -126,6 +126,28 @@ const mockFunctionDeps = () => {
 }
 
 describe('EdgeFunctionDetails', () => {
+  it('renders and copies the immutable slug after the function display name changes', async () => {
+    const user = userEvent.setup()
+    mockProjectGrantContext({ ref: 'default' })
+    mockApiKeys()
+    mockFunctionDeps('Friendly display name')
+
+    customRender(<EdgeFunctionDetails />, { profileContext })
+
+    await screen.findByDisplayValue('Friendly display name')
+    await user.click(screen.getByRole('tab', { name: 'JavaScript' }))
+    const panel = await screen.findByRole('tabpanel', { name: 'JavaScript' })
+    const example = within(panel)
+    expect(panel).toHaveTextContent("invoke('hello'")
+    expect(example.queryByText(/Friendly display name/)).not.toBeInTheDocument()
+
+    const copied = vi.spyOn(navigator.clipboard, 'writeText')
+    await user.click(example.getByRole('button', { name: /^Copy$/ }))
+    await vi.waitFor(() => expect(copied).toHaveBeenCalled())
+    expect(copied.mock.calls[0][0]).toContain("invoke('hello'")
+    expect(copied.mock.calls[0][0]).not.toContain('Friendly display name')
+  })
+
   it('requests the keys without a note when api-keys are readable', async () => {
     mockProjectGrantContext({ ref: 'default' })
     const requests = mockApiKeys()

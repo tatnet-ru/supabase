@@ -282,7 +282,7 @@ export const EdgeFunctionDetails = () => {
                   const code = tab.code({
                     showKey,
                     functionUrl,
-                    functionName: selectedFunction?.name ?? '',
+                    functionSlug: selectedFunction?.slug ?? functionSlug ?? '',
                     apiKey,
                   })
 
@@ -303,7 +303,7 @@ export const EdgeFunctionDetails = () => {
                             tab.code({
                               showKey: true,
                               functionUrl,
-                              functionName: selectedFunction?.name ?? '',
+                              functionSlug: selectedFunction?.slug ?? functionSlug ?? '',
                               apiKey,
                             })
                           )
