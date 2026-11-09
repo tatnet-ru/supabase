@@ -6,7 +6,7 @@ interface InvocationTab {
   code: (props: {
     showKey: boolean
     functionUrl: string
-    functionName: string
+    functionSlug: string
     apiKey: string
   }) => string
 }
@@ -33,10 +33,10 @@ export const INVOCATION_TABS: InvocationTab[] = [
     label: 'JavaScript',
     language: 'js',
     hideLineNumbers: true,
-    code: ({ functionName }) => `import { createClient } from '@supabase/supabase-js'
+    code: ({ functionSlug }) => `import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
-const { data, error } = await supabase.functions.invoke('${functionName}', {
+const { data, error } = await supabase.functions.invoke('${functionSlug}', {
   body: { name: 'Functions' },
 })`,
   },
@@ -45,13 +45,13 @@ const { data, error } = await supabase.functions.invoke('${functionName}', {
     label: 'Swift',
     language: 'ts',
     hideLineNumbers: true,
-    code: ({ functionName }) => `struct Response: Decodable {
+    code: ({ functionSlug }) => `struct Response: Decodable {
   // Expected response definition
 }
 
 let response: Response = try await supabase.functions
   .invoke(
-    "${functionName}",
+    "${functionSlug}",
     options: FunctionInvokeOptions(
       body: ["name": "Functions"]
     )
@@ -63,8 +63,8 @@ let response: Response = try await supabase.functions
     language: 'dart',
     hideLineNumbers: true,
     code: ({
-      functionName,
-    }) => `final res = await supabase.functions.invoke('${functionName}', body: {'name': 'Functions'});
+      functionSlug,
+    }) => `final res = await supabase.functions.invoke('${functionSlug}', body: {'name': 'Functions'});
 final data = res.data;`,
   },
   {
@@ -72,8 +72,8 @@ final data = res.data;`,
     label: 'Python',
     language: 'python',
     hideLineNumbers: true,
-    code: ({ functionName }) => `response = supabase.functions.invoke(
-    "${functionName}",
+    code: ({ functionSlug }) => `response = supabase.functions.invoke(
+    "${functionSlug}",
     invoke_options={"body": {"name": "Functions"}}
 )`,
   },
