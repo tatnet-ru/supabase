@@ -55,6 +55,10 @@ jobs:
           components/interfaces/Auth/Users/Users.utils.test.ts
           components/interfaces/ConnectSheet/ConnectSheet.test.tsx
           components/interfaces/APIKeys
+          lib/api/self-hosted/signing-keys.test.ts
+          tests/pages/api/v1/projects/[ref]/config/auth/signing-keys
+          components/interfaces/JwtSecrets/SelfHostedJWTSigningKeys.test.tsx
+          tests/pages/project/[ref]/settings/jwt/index.test.tsx
       - name: Lint Studio
         run: pnpm --filter studio run lint
       - name: Check TatNet patch formatting

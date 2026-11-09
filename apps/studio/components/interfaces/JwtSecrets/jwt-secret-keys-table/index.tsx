@@ -140,7 +140,7 @@ export const JWTSecretKeysTable = () => {
     isProjectLoading || isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
 
   const sortedKeys = useMemo(() => {
-    if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
+    if (signingKeys?.mode !== 'platform' || !Array.isArray(signingKeys.keys)) return []
 
     return signingKeys.keys.sort((a: JWTSigningKey, b: JWTSigningKey) => {
       const order: Record<JWTSigningKey['status'], number> = {

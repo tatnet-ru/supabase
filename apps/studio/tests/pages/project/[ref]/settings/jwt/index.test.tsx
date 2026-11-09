@@ -48,8 +48,8 @@ vi.mock('@/components/interfaces/JwtSecrets/jwt-secret-keys-table', () => ({
   JWTSecretKeysTable: () => <div>JWTSecretKeysTable</div>,
 }))
 
-vi.mock('@/components/ui/LocalSetupGuide', () => ({
-  LocalSetupGuide: () => <div>LocalSetupGuide</div>,
+vi.mock('@/components/interfaces/JwtSecrets/SelfHostedJWTSigningKeys', () => ({
+  SelfHostedJWTSigningKeys: () => <div>SelfHostedJWTSigningKeys</div>,
 }))
 
 describe('/project/[ref]/settings/jwt', () => {
@@ -67,19 +67,27 @@ describe('/project/[ref]/settings/jwt', () => {
     render(<JWTSigningKeysPage dehydratedState={{}} />)
 
     expect(screen.getByText('JWTSecretKeysTable')).toBeInTheDocument()
-    expect(screen.queryByText('LocalSetupGuide')).not.toBeInTheDocument()
   })
 
   it.each([
     { mode: 'CLI', isCli: true, isSelfHosted: false },
     { mode: 'Docker', isCli: false, isSelfHosted: true },
-  ])('renders only the LocalSetupGuide on self-hosted ($mode mode)', ({ isCli, isSelfHosted }) => {
+  ])(
+    'renders public verification metadata on self-hosted ($mode mode)',
+    ({ isCli, isSelfHosted }) => {
+      mockIsPlatform.value = false
+      mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli, isSelfHosted })
+
+      render(<JWTSigningKeysPage dehydratedState={{}} />)
+
+      expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
+      expect(screen.getByText('SelfHostedJWTSigningKeys')).toBeInTheDocument()
+    }
+  )
+  it('does not reveal signing metadata without read permission', () => {
     mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli, isSelfHosted })
-
+    mockUseAsyncCheckPermissions.mockReturnValue({ can: false, isSuccess: true })
     render(<JWTSigningKeysPage dehydratedState={{}} />)
-
-    expect(screen.queryByText('JWTSecretKeysTable')).not.toBeInTheDocument()
-    expect(screen.getAllByText('LocalSetupGuide')).toHaveLength(1)
+    expect(screen.queryByText('SelfHostedJWTSigningKeys')).not.toBeInTheDocument()
   })
 })
