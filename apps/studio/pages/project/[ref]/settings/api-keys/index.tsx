@@ -56,8 +56,8 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
             title="Self-hosted Supabase"
             description={
               <p>
-                <code>SUPABASE_PUBLISHABLE_KEY</code> and <code>SUPABASE_SECRET_KEY</code> are set
-                via environment variables.
+                Use the project URL and public API key below to connect your application. A legacy
+                anon key is shown when no publishable key is configured.
               </p>
             }
             actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`} />}
