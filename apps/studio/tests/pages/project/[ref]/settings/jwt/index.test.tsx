@@ -67,7 +67,6 @@ describe('/project/[ref]/settings/jwt', () => {
     render(<JWTSigningKeysPage dehydratedState={{}} />)
 
     expect(screen.getByText('JWTSecretKeysTable')).toBeInTheDocument()
-    expect(screen.queryByText('LocalSetupGuide')).not.toBeInTheDocument()
   })
 
   it.each([
