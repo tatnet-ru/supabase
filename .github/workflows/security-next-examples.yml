@@ -6,7 +6,13 @@ on:
     paths:
       - 'examples/user-management/nextjs-user-management/**'
       - 'examples/clerk/**'
+      - 'examples/caching/with-nextjs-13/**'
+      - 'examples/caching/with-nextjs-13-server-components/**'
+      - 'examples/caching/with-react-query-nextjs-14/**'
+      - 'examples/realtime/nextjs-auth-presence/**'
+      - 'examples/todo-list/nextjs-todo-list/**'
       - '.github/scripts/check-next-security-example.mjs'
+      - '.github/scripts/next-security-api-fixture.mjs'
       - '.github/workflows/security-next-examples.yml'
 
 permissions:
@@ -22,11 +28,17 @@ jobs:
         example:
           - examples/user-management/nextjs-user-management
           - examples/clerk
+          - examples/caching/with-nextjs-13
+          - examples/caching/with-nextjs-13-server-components
+          - examples/caching/with-react-query-nextjs-14
+          - examples/realtime/nextjs-auth-presence
+          - examples/todo-list/nextjs-todo-list
     env:
       NEXT_TELEMETRY_DISABLED: '1'
       NODE_OPTIONS: --no-experimental-webstorage
       NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: test-key
+      SUPABASE_SECRET_KEY: test-key
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZXhhbXBsZS5jb20k
       CLERK_SECRET_KEY: sk_test_placeholder
     steps:
@@ -36,6 +48,16 @@ jobs:
           node-version: '26'
       - run: npm install --ignore-scripts --package-lock=false
         working-directory: ${{ matrix.example }}
-      - run: npm run build
-        working-directory: ${{ matrix.example }}
-      - run: node .github/scripts/check-next-security-example.mjs '${{ matrix.example }}'
+      - name: Build and HTTP smoke with isolated API fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          node .github/scripts/next-security-api-fixture.mjs > /tmp/next-api-fixture.log 2>&1 &
+          fixture_pid=$!
+          trap 'kill "$fixture_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:54321/__fixture_health > /dev/null; then break; fi
+            sleep 1
+          done
+          npm run build --prefix '${{ matrix.example }}'
+          node .github/scripts/check-next-security-example.mjs '${{ matrix.example }}'

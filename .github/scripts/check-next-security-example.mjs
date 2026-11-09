@@ -8,6 +8,20 @@ import { setTimeout as delay } from 'node:timers/promises'
 const routesByExample = {
   'examples/user-management/nextjs-user-management': ['/', '/login'],
   'examples/clerk': ['/'],
+  'examples/caching/with-nextjs-13': ['/'],
+  'examples/caching/with-nextjs-13-server-components': [
+    '/',
+    '/static',
+    '/static/1',
+    '/server-rendered',
+    '/static-with-revalidation',
+  ],
+  'examples/caching/with-react-query-nextjs-14': ['/', '/countries/1'],
+  'examples/realtime/nextjs-auth-presence': [
+    { path: '/', status: 307, location: '/login' },
+    '/login',
+  ],
+  'examples/todo-list/nextjs-todo-list': ['/'],
 }
 const example = process.argv[2]
 assert.ok(Object.hasOwn(routesByExample, example), 'Select a supported security example')
@@ -26,7 +40,7 @@ const child = spawn(
     cwd,
     env: {
       ...process.env,
-      NEXT_PUBLIC_SUPABASE_URL: 'http://127.0.0.1:54321',
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://127.0.0.1:54321',
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'test-key',
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
         'pk_test_' + Buffer.from('clerk.example.com$').toString('base64'),
@@ -56,15 +70,21 @@ try {
     }
   }
   assert.ok(ready, 'Next did not become ready: ' + output)
-  for (const route of routesByExample[example]) {
+  for (const entry of routesByExample[example]) {
+    const {
+      path: route,
+      status,
+      location,
+    } = typeof entry === 'string' ? { path: entry, status: 200 } : entry
     const response = await fetch('http://127.0.0.1:' + port + route, {
       redirect: 'manual',
       signal: AbortSignal.timeout(20000),
     })
     const html = await response.text()
-    assert.equal(response.status, 200, route + ': ' + html.slice(0, 500) + '\n' + output)
-    assert.match(html, /<html/i)
-    console.log(example + ' ' + route + ': HTTP 200')
+    assert.equal(response.status, status, route + ': ' + html.slice(0, 500) + '\n' + output)
+    if (location) assert.equal(response.headers.get('location'), location)
+    if (status === 200) assert.match(html, /<html/i)
+    console.log(example + ' ' + route + ': HTTP ' + status)
   }
 } finally {
   child.kill('SIGTERM')

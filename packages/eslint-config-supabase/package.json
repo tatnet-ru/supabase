@@ -14,7 +14,7 @@
     "@types/node": "catalog:",
     "@typescript-eslint/parser": "^8.48.0",
     "@typescript/native": "catalog:",
-    "eslint-config-next": "^16.0.0",
+    "eslint-config-next": "^16.4.5",
     "eslint-config-prettier": "^10.0.0",
     "eslint-config-turbo": "^2.5.0",
     "tsx": "catalog:",
