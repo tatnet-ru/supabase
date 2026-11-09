@@ -8,15 +8,21 @@ import { setTimeout as delay } from 'node:timers/promises'
 const routesByExample = {
   'examples/user-management/nextjs-user-management': ['/', '/login'],
   'examples/clerk': ['/'],
-  'examples/caching/with-nextjs-13': ['/'],
+  'examples/caching/with-nextjs-13': [
+    { path: '/', status: 200, content: 'Security build fixture' },
+  ],
   'examples/caching/with-nextjs-13-server-components': [
     '/',
-    '/static',
+    { path: '/static', status: 200, content: 'Security build fixture' },
     '/static/1',
-    '/server-rendered',
+    { path: '/server-rendered', status: 200, content: 'Security build fixture' },
     '/static-with-revalidation',
   ],
-  'examples/caching/with-react-query-nextjs-14': ['/', '/countries/1'],
+  'examples/caching/with-react-query-nextjs-14': [
+    '/',
+    '/countries/1',
+    { path: '/ssrcountries/1', status: 200, content: 'Fixture country' },
+  ],
   'examples/realtime/nextjs-auth-presence': [
     { path: '/', status: 307, location: '/login' },
     '/login',
@@ -75,6 +81,7 @@ try {
       path: route,
       status,
       location,
+      content,
     } = typeof entry === 'string' ? { path: entry, status: 200 } : entry
     const response = await fetch('http://127.0.0.1:' + port + route, {
       redirect: 'manual',
@@ -83,6 +90,7 @@ try {
     const html = await response.text()
     assert.equal(response.status, status, route + ': ' + html.slice(0, 500) + '\n' + output)
     if (location) assert.equal(response.headers.get('location'), location)
+    if (content) assert.ok(html.includes(content), route + ': missing fixture content: ' + content)
     if (status === 200) assert.match(html, /<html/i)
     console.log(example + ' ' + route + ': HTTP ' + status)
   }

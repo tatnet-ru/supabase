@@ -59,5 +59,6 @@ jobs:
             if curl -fsS http://127.0.0.1:54321/__fixture_health > /dev/null; then break; fi
             sleep 1
           done
+          curl -fsS http://127.0.0.1:54321/__fixture_health > /dev/null
           npm run build --prefix '${{ matrix.example }}'
           node .github/scripts/check-next-security-example.mjs '${{ matrix.example }}'
