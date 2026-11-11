@@ -78,13 +78,13 @@ export const EdgeFunctionDetails = () => {
     FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE
   )
 
-  const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
+  const canUpdateEdgeFunction = EDGE_FUNCTIONS_WRITABLE && canUpdateEdgeFunctionPermission
 
   // Deleting IS backed in self-hosted: the TatNet edge intercepts
   // DELETE /v1/projects/{ref}/functions/{slug} and the api's shim drops the
   // mapping row, the platform serverless function behind it and its warm VMs.
-  // Renaming / verify_jwt deliberately stay platform-only — verify_jwt is not
-  // enforced on our edge, so a switch here would promise what nothing honors.
+  // PATCH uses the same authenticated management shim for name / verify_jwt;
+  // the TatNet edge enforces the saved verify_jwt setting on invocation.
   const canDeleteEdgeFunction = EDGE_FUNCTIONS_WRITABLE && canUpdateEdgeFunctionPermission
 
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
@@ -183,7 +183,7 @@ export const EdgeFunctionDetails = () => {
                     )}
                   />
                 </CardContent>
-                {IS_PLATFORM && (
+                {EDGE_FUNCTIONS_WRITABLE && (
                   <>
                     <CardContent>
                       <FormField
