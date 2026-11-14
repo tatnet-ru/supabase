@@ -55,6 +55,7 @@ jobs:
           components/interfaces/Auth/Users/Users.utils.test.ts
           components/interfaces/ConnectSheet/ConnectSheet.test.tsx
           components/interfaces/APIKeys
+          components/interfaces/Integrations/Landing/useInstalledIntegrations.test.tsx
           lib/api/self-hosted/signing-keys.test.ts
           tests/pages/api/v1/projects/[ref]/config/auth/signing-keys
           components/interfaces/JwtSecrets/SelfHostedJWTSigningKeys.test.tsx

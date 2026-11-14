@@ -1,6 +1,7 @@
 import { sqlKeys } from '@/data/sql/keys'
 
 export const databaseCronJobsKeys = {
+  tatnet: (projectRef: string | undefined) => ['projects', projectRef, 'tatnet-cron'] as const,
   create: () => ['cron-jobs', 'create'] as const,
   delete: () => ['cron-jobs', 'delete'] as const,
   alter: () => ['cronjobs', 'alter'] as const,

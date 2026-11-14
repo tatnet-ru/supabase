@@ -9,12 +9,14 @@ import {
   useProjectOAuthIntegrationData,
 } from './Landing.utils'
 import { useAvailableIntegrations } from './useAvailableIntegrations'
+import { useTatnetCronQuery } from '@/data/database-cron-jobs/tatnet-cron-query'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
 
 export const useInstalledIntegrations = () => {
@@ -87,9 +89,31 @@ export const useInstalledIntegrations = () => {
     !!extensions.find((ext) => ext.name === 'pg_net')?.installed_version &&
     schemas.some((schema) => schema.name === 'supabase_functions')
 
+  const shouldCheckTatnetCron =
+    !IS_PLATFORM &&
+    isSuccessExtensions &&
+    isSuccessSchemas &&
+    !extensions.some((ext) => ext.name === 'pg_cron' && !!ext.installed_version) &&
+    schemas.some((schema) => schema.name === 'cron')
+
+  const {
+    data: isTatnetCron,
+    error: tatnetCronError,
+    isLoading: isTatnetCronLoading,
+    isSuccess: isTatnetCronSuccess,
+    isError: isTatnetCronError,
+  } = useTatnetCronQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: shouldCheckTatnetCron }
+  )
+
   const installedIntegrations = useMemo(() => {
     return allIntegrations
       .filter((integration) => {
+        if (integration.id === 'cron' && shouldCheckTatnetCron && isTatnetCron) return true
         if (integration.id === 'webhooks') return isHooksEnabled
         if (integration.id === 'data_api') return true
         // Availability is already gated by the org allow-list in `useAvailableIntegrations`, and
@@ -114,31 +138,44 @@ export const useInstalledIntegrations = () => {
         return false
       })
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, oauthData])
+  }, [
+    allIntegrations,
+    wrappers,
+    extensions,
+    schemas,
+    isHooksEnabled,
+    oauthData,
+    shouldCheckTatnetCron,
+    isTatnetCron,
+  ])
 
   const error =
     fdwError ||
     extensionsError ||
     schemasError ||
     availableIntegrationsError ||
+    (shouldCheckTatnetCron ? tatnetCronError : null) ||
     (canReadOAuthApps && hasOAuthIntegration ? oauthDataError : null)
   const isLoading =
     isSchemasLoading ||
     isFDWLoading ||
     isExtensionsLoading ||
     isAvailableIntegrationsLoading ||
+    (shouldCheckTatnetCron && isTatnetCronLoading) ||
     (hasOAuthIntegration && canReadOAuthApps && isOAuthDataLoading)
   const isError =
     isErrorFDWs ||
     isErrorExtensions ||
     isErrorSchemas ||
     isErrorAvailableIntegrations ||
+    (shouldCheckTatnetCron && isTatnetCronError) ||
     (hasOAuthIntegration && canReadOAuthApps && isErrorOAuthData)
   const isSuccess =
     isSuccessFDWs &&
     isSuccessExtensions &&
     isSuccessSchemas &&
     isSuccessAvailableIntegrations &&
+    (!shouldCheckTatnetCron || isTatnetCronSuccess) &&
     (!hasOAuthIntegration || !canReadOAuthApps || isSuccessOAuthData)
 
   return {
