@@ -29,6 +29,6 @@
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
     "vite": "^8.3.5",
-    "@nuxt/nitro-server": "4.6.3"
+    "@nuxt/nitro-server": "4.6.4"
   }
 }
