@@ -28,7 +28,7 @@
     "@octokit/core": "^7.0.6",
     "@octokit/plugin-retry": "^8.1.0",
     "@supabase/supabase-js": "catalog:",
-    "astro": "^7.4.2",
+    "astro": "^7.4.7",
     "common": "workspace:*",
     "docs-search": "workspace:*",
     "gray-matter": "^4.0.3",
